@@ -1,15 +1,13 @@
 /**
  * game.js
- * Inisialisasi game engine Kaplay, registrasi seluruh scene, dan preload.
+ * Inisialisasi game engine Kaplay dan integrasi seluruh scene Snake Arcade (Data Worm).
  */
 
 import kaplay from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
-import { menuScene } from "./scenes/menu.js?v=2";
-import { stageSelectScene } from "./scenes/stageSelect.js";
+import { menuScene } from "./scenes/menu.js";
 import { gameplayScene } from "./scenes/gameplay.js";
 import { gameOverScene } from "./scenes/gameOver.js";
-import { victoryScene } from "./scenes/victory.js";
-import { initAudio } from "./audio.js?v=2";
+import { initAudio } from "./audio.js";
 
 const k = kaplay({
   width: 800,
@@ -25,17 +23,15 @@ const k = kaplay({
 
 k.loadRoot("./assets/img/");
 
-// Registrasi semua Scene
+// Registrasi Seluruh Scene
 menuScene(k);
-stageSelectScene(k);
 gameplayScene(k);
 gameOverScene(k);
-victoryScene(k);
 
 // Scene Preload
 k.scene("preload", () => {
   k.add([
-    k.text("LOADING BATTLE MTK...", { size: 20, font: "monospace" }),
+    k.text("LOADING DATA WORM PROTOCOL...", { size: 18, font: "monospace" }),
     k.pos(400, 300),
     k.anchor("center"),
     k.color(34, 197, 94)
@@ -43,7 +39,7 @@ k.scene("preload", () => {
 
   initAudio(k);
 
-  k.wait(1.5, () => {
+  k.wait(1.2, () => {
     k.go("menu");
   });
 });
@@ -51,3 +47,4 @@ k.scene("preload", () => {
 window.k = k;
 k.go("preload");
 
+export default k;

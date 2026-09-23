@@ -207,3 +207,72 @@ body.theme-light {
     --input-bg: #ffffff;
     --input-text: #0f172a;
 }
+
+/* Fullscreen Retro Loader */
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #05050f;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#loader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.box-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 18px);
+    grid-template-rows: repeat(3, 18px);
+    gap: 6px;
+    margin-bottom: 25px;
+}
+
+.box-grid .box {
+    width: 18px;
+    height: 18px;
+    background: #00ff41;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+    animation: box-blink 1.2s infinite ease-in-out;
+}
+
+.box-grid .box:nth-child(1) { animation-delay: 0.0s; }
+.box-grid .box:nth-child(2) { animation-delay: 0.1s; }
+.box-grid .box:nth-child(3) { animation-delay: 0.2s; }
+.box-grid .box:nth-child(4) { animation-delay: 0.3s; }
+.box-grid .box:nth-child(5) { animation-delay: 0.4s; }
+.box-grid .box:nth-child(6) { animation-delay: 0.5s; }
+.box-grid .box:nth-child(7) { animation-delay: 0.6s; }
+.box-grid .box:nth-child(8) { animation-delay: 0.7s; }
+.box-grid .box:nth-child(9) { animation-delay: 0.8s; }
+
+@keyframes box-blink {
+    0%, 100% { opacity: 0.2; transform: scale(0.75); }
+    50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 18px #00ff41; }
+}
+
+.loader-text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.85rem;
+    color: #00ff41;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+    animation: loader-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes loader-pulse {
+    0% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+}

@@ -32,8 +32,15 @@ Setiap pengguna bertindak sebagai **Komandan Luar Angkasa** yang memiliki profil
 - 🏆 **Leaderboard & Realtime Flight Hours**:
   - Papan peringkat skor tertinggi per game.
   - Pelacak jam terbang (*flight hours*) yang bertambah secara otomatis setiap menyelesaikan permainan.
-- 👾 **Game Hari Ini: Battle MTK**:
-  - Game duel matematika retro dengan 10 Stage, pertarungan monster boss, combo multiplier, dan efek partikel *critical hit*.
+
+---
+
+## 🕹️ Daftar Game Aktif
+
+1. **Battle MTK**:
+   - Game duel matematika retro dengan 10 Stage, pertarungan monster boss, combo multiplier, dan efek partikel *critical hit*.
+2. **Snake Arcade (Data Worm Protocol)**:
+   - Game arkade klasik kontrol cacing data luar angkasa dengan sistem power-up (Slow-Mo & Ghost Mode), akselerasi dinamis, dan multi-kontroler (WASD / Arrow Keys / Virtual D-Pad / Touch Swipe).
 
 ---
 
@@ -42,7 +49,41 @@ Setiap pengguna bertindak sebagai **Komandan Luar Angkasa** yang memiliki profil
 - **Frontend**: HTML5, CSS3 Variables, Vanilla JavaScript (ESM).
 - **Game Engine**: [Kaplay.js](https://kaplayjs.com/) v3001.0.19 (via CDN).
 - **Backend & Database**: [Firebase](https://firebase.google.com/) (Authentication & Realtime Database).
+- **Analytics**: [Umami Cloud](https://cloud.umami.is/) (Privacy-friendly analytics).
+- **Error Tracking**: [Sentry](https://sentry.io/) (Browser error tracking & monitoring).
 - **Styling**: Google Fonts (`Press Start 2P`, `VT323`) + Custom CRT Scanline Canvas FX.
+
+---
+
+## 💻 Menjalankan di Lokal
+
+Untuk menjalankan project di komputer lokal:
+
+```bash
+# Clone repositori
+git clone https://github.com/rahmat48/GameEveryday.git
+cd GameEveryday
+
+# Jalankan server lokal (pilih salah satu)
+python -m http.server 8000
+# atau
+npx serve -p 8000
+# atau
+php -S localhost:8000
+```
+
+Buka browser dan akses: `http://localhost:8000`
+
+---
+
+## 🚀 Panduan Deploy
+
+Website dideploy menggunakan **GitHub Pages**:
+1. Pastikan seluruh perubahan di-commit ke branch `main`.
+2. Di GitHub Repository, masuk ke **Settings** > **Pages**.
+3. Atur Source ke `Deploy from a branch` dengan branch `main` folder `/ (root)`.
+4. Custom Domain diatur ke `game.rahmatdwi.my.id` dengan file `CNAME`.
+5. Pastikan Enforce HTTPS diaktifkan.
 
 ---
 
@@ -51,20 +92,33 @@ Setiap pengguna bertindak sebagai **Komandan Luar Angkasa** yang memiliki profil
 ```text
 GAME_EVERYDAY/
 ├── index.html              # Halaman Depan / Gerbang Login & Live Preview
-├── hub.html                # Mission Control (Katalog Game & Profil Komandan)
+├── dashboard.html          # Mission Control (Katalog Game & Profil Komandan)
+├── hub.html                # Auto-redirect aman ke dashboard
+├── 404.html                # Halaman 404 Retro Sci-Fi
+├── firebase-config.js      # Konfigurasi Terpusat Firebase
 ├── app.js                  # Logika Utama, Firebase SDK, Tema & Animasi
 ├── style.css               # Desain Antarmuka CRT & Variasi Tema
 ├── games.json              # Basis Data Katalog Game Harian
+├── database.rules.json     # Aturan Validasi Keamanan Firebase Realtime DB
+├── assets/                 # Folder Aset Statis Global (img, audio)
 └── games/
-    └── battle-mtk/         # Game Edukasi Duel Matematika
+    ├── battle-mtk/         # Game Edukasi Duel Matematika
+    │   ├── index.html
+    │   ├── assets/
+    │   ├── css/style.css
+    │   └── js/
+    └── snake-arcade/       # Game Retro Data Worm (Snake)
         ├── index.html
+        ├── assets/
         ├── css/style.css
         └── js/
+            ├── audio.js
             ├── game.js
-            ├── questions.js
+            ├── input.js
+            ├── mobileController.js
+            ├── swipe.js
             ├── ui.js
             ├── user.js
-            ├── audio.js
             └── scenes/
 ```
 

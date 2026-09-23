@@ -1,18 +1,33 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyBtIJ1m2Jcg_4xUzeDeobhWN3H4KjXyAls",
-  authDomain: "gameeveryday-98db3.firebaseapp.com",
-  databaseURL: "https://gameeveryday-98db3-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "gameeveryday-98db3",
-  storageBucket: "gameeveryday-98db3.firebasestorage.app",
-  messagingSenderId: "447356300912",
-  appId: "1:447356300912:web:68c10f6b66762bce4b0eb5",
-  measurementId: "G-TJK71F081W"
-};
+import { firebaseConfig } from "./firebase-config.js";
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
+
+// State variables
+let currentMode = 'login';
+let selectedAvatar = '🚀';
+let tempProfileAvatar = '🚀';
+
+// Analytics Event Tracking (Umami)
+function trackEvent(eventName, eventData = {}) {
+    if (window.umami && typeof window.umami.track === 'function') {
+        window.umami.track(eventName, eventData);
+    }
+}
+
+function launchGame(path, id, title) {
+    trackEvent('game_click', { game: id, title });
+    trackEvent('game_played', { game: id });
+    window.location.href = path;
+}
+
+window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'GAME_EVENT') {
+        trackEvent(event.data.name || 'game_event', event.data.payload || {});
+    }
+});
 
 // Load Games
 async function loadGames() {
@@ -34,11 +49,11 @@ async function loadGames() {
         const releaseDate = game.releaseDate || game.date || '';
         const canvasId = `card-anim-${idx}`;
         card.innerHTML = `
-            <canvas id="${canvasId}" width="280" height="130" style="width: 100%; height: 130px; background: #070714; border: 1px dashed var(--border-color); border-radius: 4px; display: block; margin-bottom: 12px; cursor: pointer;" onclick="window.location.href='${game.path}'"></canvas>
-            <h3 style="cursor: pointer;" onclick="window.location.href='${game.path}'">${game.title}</h3>
+            <canvas id="${canvasId}" width="280" height="130" style="width: 100%; height: 130px; background: #070714; border: 1px dashed var(--border-color); border-radius: 4px; display: block; margin-bottom: 12px; cursor: pointer;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')"></canvas>
+            <h3 style="cursor: pointer;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')">${game.title}</h3>
             <p>${game.description}</p>
             <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 10px;">
-                <button onclick="window.location.href='${game.path}'" style="flex: 2; padding: 8px; font-size: 1rem;">MAIN</button>
+                <button onclick="launchGame('${game.path}', '${game.id}', '${game.title}')" style="flex: 2; padding: 8px; font-size: 1rem;">MAIN</button>
                 <button onclick="openLeaderboard('${game.id}', '${game.title}')" style="flex: 1; padding: 8px; font-size: 0.95rem; border-color: #f59e0b; color: #f59e0b;">🏆 SKOR</button>
             </div>
             <small>RILIS: ${releaseDate}</small>
@@ -76,6 +91,8 @@ async function openLeaderboard(gameId, gameTitle) {
             let score = 0;
             if (gameId === 'battle-mtk') {
                 score = (u.battleMTK && u.battleMTK.highScore) || 0;
+            } else if (gameId === 'snake-arcade') {
+                score = (u.snakeArcade && u.snakeArcade.highScore) || 0;
             } else {
                 score = u.highScore || 0;
             }
@@ -290,6 +307,9 @@ async function handleAuth() {
                 gamesPlayed: 0,
                 totalPlayTime: 0
             });
+            trackEvent('user_signup', { avatar: selectedAvatar });
+        } else {
+            trackEvent('user_login', { method: 'email' });
         }
         closeAuthModal();
     } catch (error) {
@@ -337,12 +357,30 @@ async function handleForgotPassword() {
 }
 
 function logout() {
+    trackEvent('user_logout');
     auth.signOut();
+}
+
+const pageStartTime = Date.now();
+const MIN_LOADER_TIME = 2000; // Minimal 2 detik animasi memuat data
+
+function hideLoader() {
+    const elapsed = Date.now() - pageStartTime;
+    const delay = Math.max(0, MIN_LOADER_TIME - elapsed);
+    setTimeout(() => {
+        const loader = document.getElementById('loader');
+        if (loader && !loader.classList.contains('fade-out')) {
+            loader.classList.add('fade-out');
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
+    }, delay);
 }
 
 auth.onAuthStateChanged(async user => {
     const isLandingPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
-    const isHubPage = window.location.pathname.endsWith('hub.html');
+    const isDashboardPage = window.location.pathname.endsWith('dashboard.html');
 
     if (user) {
         // Ambil data profil dari Realtime Database
@@ -354,9 +392,9 @@ auth.onAuthStateChanged(async user => {
         localStorage.setItem('user_name', displayName);
         localStorage.setItem('user_avatar', avatar);
 
-        // Jika user sudah login dan sedang di landing page, redirect ke hub misi
+        // Jika user sudah login dan sedang di landing page, redirect ke dashboard misi
         if (isLandingPage) {
-            window.location.href = 'hub.html';
+            window.location.href = 'dashboard.html';
             return;
         }
 
@@ -389,19 +427,22 @@ auth.onAuthStateChanged(async user => {
         });
 
         // Popup otomatis jika nama belum pernah diatur
-        if (!data.name && isHubPage) {
+        if (!data.name && isDashboardPage) {
             openProfileModal('');
         }
 
         loadGames();
+        hideLoader();
     } else {
         localStorage.removeItem('user_name');
         localStorage.removeItem('user_avatar');
 
-        // Jika belum login tapi coba akses hub.html, tendang ke index.html
-        if (isHubPage) {
+        // Jika belum login tapi coba akses dashboard.html, tendang ke index.html
+        if (isDashboardPage) {
             window.location.href = 'index.html';
+            return;
         }
+        hideLoader();
     }
 });
 
@@ -834,7 +875,7 @@ function initPreviewAnimation() {
 }
 initPreviewAnimation();
 
-// Mini Animation for Game Card Preview in hub.html
+// Mini Animation for Game Card Preview in dashboard.html
 function initCardPreviewAnim(canvasId, title) {
     const c = document.getElementById(canvasId);
     if (!c) return;
@@ -856,6 +897,26 @@ function initCardPreviewAnim(canvasId, title) {
             ctx.moveTo(0, gy);
             ctx.lineTo(c.width, gy);
             ctx.stroke();
+        }
+
+        // Variasi preview jika kartu adalah Snake Arcade
+        if (title && title.toLowerCase().includes('snake')) {
+            const t = Date.now() / 250;
+            ctx.fillStyle = '#22c55e';
+            for (let i = 0; i < 5; i++) {
+                const sx = 90 + (i * 14) + Math.sin(t + i * 0.6) * 10;
+                const sy = 65 + Math.cos(t + i * 0.6) * 8;
+                ctx.fillRect(sx, sy, 10, 10);
+            }
+            ctx.fillStyle = '#d946ef';
+            ctx.fillRect(195, 62, 10, 10);
+
+            ctx.fillStyle = '#22c55e';
+            ctx.font = '10px monospace';
+            ctx.fillText('WORM PROTOCOL LIVE', 12, 20);
+
+            requestAnimationFrame(render);
+            return;
         }
 
         // Animasi karakter pesawat / icon
@@ -889,3 +950,61 @@ function initCardPreviewAnim(canvasId, title) {
     }
     render();
 }
+
+// Global Error Handling & Toast Notification
+function showToast(msg, isError = true) {
+    let toast = document.getElementById('retro-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'retro-toast';
+        toast.style.cssText = 'position:fixed;bottom:75px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:4px;font-family:"VT323",monospace;font-size:1.25rem;z-index:999999;transition:opacity 0.3s ease;pointer-events:none;box-shadow:0 0 15px rgba(0,0,0,0.8);text-align:center;';
+        document.body.appendChild(toast);
+    }
+    toast.style.background = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(22, 163, 74, 0.95)';
+    toast.style.color = '#ffffff';
+    toast.style.border = isError ? '2px solid #ef4444' : '2px solid #22c55e';
+    toast.innerText = msg;
+    toast.style.opacity = '1';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 4000);
+}
+
+window.addEventListener('error', (event) => {
+    if (window.Sentry && typeof Sentry.captureException === 'function') {
+        Sentry.captureException(event.error || new Error(event.message));
+    }
+    showToast(`⚠ Sistem: ${event.message || 'Kesalahan sistem'}`);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    if (window.Sentry && typeof Sentry.captureException === 'function') {
+        Sentry.captureException(event.reason);
+    }
+    const msg = event.reason?.message || event.reason || 'Unhandled Promise';
+    showToast(`⚠ Kesalahan: ${msg}`);
+});
+
+// Expose functions globally for inline HTML event handlers
+Object.assign(window, {
+    showAuthModal,
+    closeAuthModal,
+    handleAuth,
+    handleForgotPassword,
+    selectAvatar,
+    openProfileModal,
+    closeProfileModal,
+    saveUserProfile,
+    selectProfileAvatar,
+    openLeaderboard,
+    closeLeaderboardModal,
+    openFlightHoursLeaderboard,
+    logout,
+    toggleAudio,
+    toggleThemeMenu,
+    setTheme,
+    loadGames,
+    showToast,
+    launchGame,
+    trackEvent
+});

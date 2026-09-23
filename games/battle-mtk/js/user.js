@@ -6,17 +6,7 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, get, set, update, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBtIJ1m2Jcg_4xUzeDeobhWN3H4KjXyAls",
-  authDomain: "gameeveryday-98db3.firebaseapp.com",
-  databaseURL: "https://gameeveryday-98db3-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "gameeveryday-98db3",
-  storageBucket: "gameeveryday-98db3.firebasestorage.app",
-  messagingSenderId: "447356300912",
-  appId: "1:447356300912:web:68c10f6b66762bce4b0eb5",
-  measurementId: "G-TJK71F081W"
-};
+import { firebaseConfig } from "../../../firebase-config.js";
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const auth = getAuth(app);

@@ -110,7 +110,7 @@ export function menuScene(k) {
     });
 
     makeButton(k, "EXIT", k.vec2(400, 490), () => {
-      window.location.href = "../../hub.html";
+      window.location.href = "../../dashboard.html";
     });
   });
 }

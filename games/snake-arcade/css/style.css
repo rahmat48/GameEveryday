@@ -1,0 +1,184 @@
+:root {
+  --green: #22c55e;
+  --purple: #a855f7;
+  --bg: #0a0a1a;
+  --bg-panel: rgba(10, 10, 26, 0.85);
+  --text: #e0e0ff;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  touch-action: none;
+}
+
+/* CRT Scanline Overlay */
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 4px,
+    rgba(0, 0, 0, 0.15) 4px,
+    rgba(0, 0, 0, 0.15) 6px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+#hud-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--green);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  z-index: 10;
+}
+
+#commander-info {
+  color: var(--text);
+  text-shadow: 0 0 6px var(--green);
+}
+
+#btn-back {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 8px 14px;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+  transition: all 0.2s;
+}
+
+#btn-back:hover {
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
+}
+
+#game-container {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 56px;
+}
+
+#game-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: calc(100vh - 70px);
+  border-radius: 8px;
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.4);
+  border: 2px solid var(--green);
+}
+
+/* Mobile D-Pad Controller */
+#mobile-controller {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #game-container {
+    max-height: 55vh;
+  }
+
+  #game-container canvas {
+    max-height: 55vh;
+  }
+
+  #mobile-controller {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    grid-template-rows: repeat(3, 64px);
+    gap: 8px;
+    padding: 12px;
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dpad-btn {
+    width: 64px;
+    height: 64px;
+    background: rgba(34, 197, 94, 0.15);
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    color: var(--green);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+    transition: transform 0.1s, background 0.1s;
+  }
+
+  .dpad-btn:active {
+    transform: scale(0.9);
+    background: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.8);
+  }
+
+  .dpad-empty {
+    width: 64px;
+    height: 64px;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 600px) {
+  #hud-top {
+    font-size: 8px;
+    padding: 0 10px;
+    height: 48px;
+  }
+
+  #game-container {
+    margin-top: 48px;
+  }
+}

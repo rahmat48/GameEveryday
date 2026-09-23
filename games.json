@@ -4,9 +4,17 @@
     "title": "Battle MTK",
     "description": "Duel matematika melawan monster. Jawab soal, kalahkan boss!",
     "genre": "Puzzle",
-    "date": "2026-09-23",
-    "releaseDate": "2026-09-23",
+    "releaseDate": "2025-01-01",
     "path": "games/battle-mtk/index.html",
     "thumbnail": "games/battle-mtk/assets/img/thumb.png"
+  },
+  {
+    "id": "snake-arcade",
+    "title": "Snake Arcade",
+    "description": "Kendalikan data worm, makan byte, hindari diri sendiri. Kecepatan naik tiap 5 makan!",
+    "genre": "Arcade",
+    "releaseDate": "2025-02-01",
+    "path": "games/snake-arcade/index.html",
+    "thumbnail": "games/snake-arcade/assets/img/thumb.png"
   }
 ]

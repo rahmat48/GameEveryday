@@ -121,6 +121,15 @@ export function gameplayScene(k) {
       const duration = (Date.now() - state.startTime) / 1000;
       await saveBattleScore(uid, state.stage, state.score, stars, state.maxCombo);
       await updateGameStats(uid, duration);
+
+      if (typeof window !== "undefined") {
+        window.postMessage({
+          type: "GAME_EVENT",
+          name: "battle_mtk_stage_clear",
+          payload: { stage: state.stage, score: state.score, stars, maxCombo: state.maxCombo }
+        }, "*");
+      }
+
       k.go("victory", {
         stage: state.stage,
         score: state.score,

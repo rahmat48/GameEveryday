@@ -1,21 +1,21 @@
 {
   "rules": {
     "users": {
-      ".read": "auth != null",
       "$uid": {
-        ".write": "auth != null && auth.uid === $uid",
-        ".validate": "newData.hasChildren(['email'])",
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid",
+        ".validate": "newData.hasChildren(['name', 'avatar', 'email'])",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 30"
+        },
+        "avatar": {
+          ".validate": "newData.isString() && newData.val().length <= 4"
+        },
         "email": {
           ".validate": "newData.isString()"
         },
-        "name": {
-          ".validate": "newData.isString() && newData.val().length <= 30"
-        },
-        "avatar": {
-          ".validate": "newData.isString() && newData.val().length <= 5"
-        },
         "highScore": {
-          ".validate": "newData.isNumber() && newData.val() >= 0"
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
         },
         "gamesPlayed": {
           ".validate": "newData.isNumber() && newData.val() >= 0"
@@ -25,15 +25,29 @@
         },
         "battleMTK": {
           "highScore": {
-            ".validate": "newData.isNumber() && newData.val() >= 0"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
           },
           "stages": {
             "$stage": {
-              ".validate": "newData.hasChildren(['score', 'stars'])",
-              "score": { ".validate": "newData.isNumber()" },
-              "stars": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3" },
-              "bestCombo": { ".validate": "newData.isNumber() && newData.val() >= 0" }
+              ".validate": "$stage.matches(/^([1-9]|10)$/)",
+              "stars": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+              },
+              "bestCombo": {
+                ".validate": "newData.isNumber() && newData.val() >= 0"
+              }
             }
+          }
+        },
+        "snakeArcade": {
+          "highScore": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
+          },
+          "highLength": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "bestDuration": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
           }
         }
       }

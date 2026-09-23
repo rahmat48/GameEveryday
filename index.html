@@ -3,11 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Game Hub</title>
+    <title>Space Game Hub - Kumpulan Game Retro Sci-Fi</title>
+    <meta name="description" content="Space Game Hub - Kumpulan game retro sci-fi harian berbasis web. Tantang dirimu dan raih skor tertinggi komandan luar angkasa!">
+    <meta name="theme-color" content="#050505">
+    <link rel="canonical" href="https://game.rahmatdwi.my.id/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://game.rahmatdwi.my.id/">
+    <meta property="og:title" content="Space Game Hub - Kumpulan Game Retro Sci-Fi">
+    <meta property="og:description" content="Mainkan game retro sci-fi seru setiap hari langsung di browser tanpa instalasi.">
+    <meta property="og:image" content="https://game.rahmatdwi.my.id/assets/img/og-image.png">
+    <meta property="og:site_name" content="Space Game Hub">
+    <meta property="og:locale" content="id_ID">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://game.rahmatdwi.my.id/">
+    <meta name="twitter:title" content="Space Game Hub - Kumpulan Game Retro Sci-Fi">
+    <meta name="twitter:description" content="Mainkan game retro sci-fi seru setiap hari langsung di browser tanpa instalasi.">
+    <meta name="twitter:image" content="https://game.rahmatdwi.my.id/assets/img/og-image.png">
+
     <link id="dynamic-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ff41'><path d='M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/></svg>">
     <link rel="stylesheet" href="style.css">
+
+    <!-- Sentry Error Tracking -->
+    <script src="https://browser.sentry-cdn.com/7.114.0/bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+      if (window.Sentry) {
+        const isProduction = window.location.hostname === 'game.rahmatdwi.my.id';
+        Sentry.init({
+          dsn: window.SENTRY_DSN || "",
+          environment: isProduction ? 'production' : 'development',
+          ignoreErrors: [
+            'ResizeObserver loop limit exceeded',
+            'Non-Error promise rejection captured',
+            'Network request failed'
+          ]
+        });
+      }
+    </script>
+
+    <!-- Umami Analytics -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="00000000-0000-0000-0000-000000000000"></script>
 </head>
 <body>
+    <!-- Retro Loading Screen -->
+    <div id="loader">
+        <div class="box-grid">
+            <div class="box"></div><div class="box"></div><div class="box"></div>
+            <div class="box"></div><div class="box"></div><div class="box"></div>
+            <div class="box"></div><div class="box"></div><div class="box"></div>
+        </div>
+        <div class="loader-text">MEMUAT SISTEM...</div>
+    </div>
+
     <canvas id="space-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></canvas>
     
     <header>
@@ -82,6 +132,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js?v=3"></script>
 </body>
 </html>

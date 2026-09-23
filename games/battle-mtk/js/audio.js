@@ -19,7 +19,7 @@ export function initAudio(k) {
 
   soundList.forEach((s) => {
     try {
-      k.loadSound(s, `./assets/audio/${s}.mp3`).catch(() => {
+      k.loadSound(s, `../audio/${s}.mp3`).catch(() => {
         // Abaikan file audio jika belum ada di folder aset
       });
       sounds[s] = true;

@@ -2,9 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#22c55e">
-  <title>Battle MTK - Space Game Hub</title>
+  <title>Snake Arcade - Space Game Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -19,20 +19,23 @@
         dsn: window.SENTRY_DSN || "",
         environment: isProduction ? 'production' : 'development'
       });
-      Sentry.setTag('game', 'battle-mtk');
+      Sentry.setTag('game', 'snake-arcade');
     }
   </script>
 </head>
 <body>
   <div id="hud-top">
-    <div id="commander-info">Commander</div>
+    <div id="commander-info">🚀 Commander</div>
     <button id="btn-back" onclick="window.location.href='../../dashboard.html'">BACK</button>
   </div>
 
   <div id="game-container"></div>
 
+  <!-- On-Screen D-Pad (Mobile Controller) -->
+  <div id="mobile-controller"></div>
+
   <script>
-    const savedTheme = localStorage.getItem('hub_selected_theme') || 'purple';
+    const savedTheme = localStorage.getItem('hub_selected_theme') || 'green';
     document.body.className = `theme-${savedTheme}`;
 
     const commanderName = localStorage.getItem('user_name') || 'Commander';
@@ -42,6 +45,6 @@
       infoEl.textContent = `${commanderAvatar} ${commanderName}`;
     }
   </script>
-  <script type="module" src="./js/game.js?v=3"></script>
+  <script type="module" src="./js/game.js"></script>
 </body>
 </html>

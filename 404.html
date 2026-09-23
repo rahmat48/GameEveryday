@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Halaman Hilang di Luar Angkasa | Space Game Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 85vh;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+            position: relative;
+        }
+        .error-code {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 5rem;
+            color: #ef4444;
+            text-shadow: 0 0 20px #ef4444, 0 0 40px rgba(239, 68, 68, 0.6);
+            margin: 0 0 20px 0;
+            animation: glitch 1.5s infinite alternate;
+        }
+        .error-ufo {
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            animation: float-ufo 3s ease-in-out infinite alternate;
+            display: inline-block;
+        }
+        .error-msg {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.1rem;
+            color: #38bdf8;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+        .error-desc {
+            font-size: 1.4rem;
+            color: #cbd5e1;
+            max-width: 500px;
+            margin: 0 auto 35px auto;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .error-btn {
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            padding: 10px 24px;
+            background: rgba(10, 10, 26, 0.8);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            text-decoration: none;
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(0, 255, 65, 0.4);
+            transition: all 0.2s ease;
+        }
+        .error-btn:hover {
+            background: #00ff41;
+            color: #050505;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.8);
+        }
+        .error-btn.secondary {
+            border-color: #a855f7;
+            color: #a855f7;
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+        }
+        .error-btn.secondary:hover {
+            background: #a855f7;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+        }
+        @keyframes float-ufo {
+            0% { transform: translateY(0) rotate(-3deg); }
+            100% { transform: translateY(-18px) rotate(4deg); }
+        }
+        @keyframes glitch {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(-2deg); }
+            40% { transform: skew(2deg); }
+            60% { transform: skew(-1deg); }
+            80% { transform: skew(1deg); }
+            100% { transform: skew(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-ufo">🛸</div>
+        <h1 class="error-code">404</h1>
+        <div class="error-msg">HALAMAN HILANG DI LUAR ANGKASA</div>
+        <p class="error-desc">Koordinat sektor luar angkasa yang Anda tuju tidak ditemukan atau telah terhisap ke dalam lubang hitam.</p>
+        <div class="btn-group">
+            <a href="/" class="error-btn">KEMBALI KE HUB</a>
+            <a href="/#games" class="error-btn secondary">LIHAT GAME</a>
+        </div>
+    </div>
+</body>
+</html>
