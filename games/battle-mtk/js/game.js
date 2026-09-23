@@ -4,7 +4,7 @@
  */
 
 import kaplay from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
-import { menuScene } from "./scenes/menu.js";
+import { menuScene } from "./scenes/menu.js?v=2";
 import { stageSelectScene } from "./scenes/stageSelect.js";
 import { gameplayScene } from "./scenes/gameplay.js";
 import { gameOverScene } from "./scenes/gameOver.js";

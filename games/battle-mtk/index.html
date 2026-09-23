@@ -19,6 +19,9 @@
   <div id="game-container"></div>
 
   <script>
+    const savedTheme = localStorage.getItem('hub_selected_theme') || 'purple';
+    document.body.className = `theme-${savedTheme}`;
+
     const commanderName = localStorage.getItem('user_name') || 'Commander';
     const commanderAvatar = localStorage.getItem('user_avatar') || '🚀';
     const infoEl = document.getElementById('commander-info');
@@ -26,6 +29,6 @@
       infoEl.textContent = `${commanderAvatar} ${commanderName}`;
     }
   </script>
-  <script type="module" src="./js/game.js"></script>
+  <script type="module" src="./js/game.js?v=2"></script>
 </body>
 </html>

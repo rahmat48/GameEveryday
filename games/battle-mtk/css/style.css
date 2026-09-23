@@ -1,6 +1,6 @@
 :root {
-  --green: #22c55e;
-  --purple: #a855f7;
+  --green: #a855f7;
+  --purple: #d946ef;
   --bg: #0a0a1a;
   --bg-panel: rgba(10, 10, 26, 0.85);
   --text: #e0e0ff;
@@ -98,8 +98,17 @@ body::after {
   border: 1px solid var(--green);
 }
 
+body.theme-green {
+  --green: #22c55e;
+  --purple: #16a34a;
+  --bg: #050505;
+  --bg-panel: rgba(5, 5, 5, 0.9);
+  --text: #e0e0ff;
+}
+
 body.theme-purple {
   --green: #a855f7;
+  --purple: #d946ef;
   --bg: #0d061a;
   --bg-panel: rgba(13, 6, 26, 0.85);
   --text: #f3e8ff;

@@ -3,14 +3,16 @@
  * Scene menu utama Battle MTK.
  */
 
-import { makeButton, retroPanel } from "../ui.js";
+import { makeButton, retroPanel, getGameThemeColors } from "../ui.js?v=2";
 import { getCurrentUser, loadBattleProgress } from "../user.js";
 
 export function menuScene(k) {
   k.scene("menu", async () => {
+    const themeColors = getGameThemeColors(k);
+
     // Starfield Background
     k.loop(0.3, () => {
-      const starColor = Math.random() > 0.5 ? k.rgb(255, 255, 255) : k.rgb(180, 220, 255);
+      const starColor = Math.random() > 0.5 ? k.rgb(255, 255, 255) : themeColors.secondary;
       const star = k.add([
         k.rect(2, 2),
         k.pos(Math.random() * 800, -10),
@@ -32,7 +34,7 @@ export function menuScene(k) {
       k.text("BATTLE MTK", { size: 40, font: "monospace" }),
       k.pos(400, 180),
       k.anchor("center"),
-      k.color(34, 197, 94),
+      k.color(themeColors.secondary),
       k.opacity(0.3)
     ]);
 
@@ -40,7 +42,7 @@ export function menuScene(k) {
       k.text("BATTLE MTK", { size: 40, font: "monospace" }),
       k.pos(400, 180),
       k.anchor("center"),
-      k.color(34, 197, 94)
+      k.color(themeColors.secondary)
     ]);
 
     // Subtitle
@@ -48,7 +50,7 @@ export function menuScene(k) {
       k.text("MATH COMBAT SIMULATOR", { size: 28, font: "monospace" }),
       k.pos(400, 230),
       k.anchor("center"),
-      k.color(168, 85, 247)
+      k.color(themeColors.primary)
     ]);
 
     // Commander Info

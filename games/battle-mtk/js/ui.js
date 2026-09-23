@@ -6,13 +6,38 @@
 /**
  * Membuat tombol retro dengan hover dan animasi klik.
  */
+export function getGameThemeColors(k) {
+  const t = localStorage.getItem('hub_selected_theme') || 'purple';
+  if (t === 'green') {
+    return {
+      primary: k.rgb(34, 197, 94),
+      secondary: k.rgb(168, 85, 247),
+      border: k.rgb(34, 197, 94)
+    };
+  } else if (t === 'light') {
+    return {
+      primary: k.rgb(2, 132, 199),
+      secondary: k.rgb(56, 189, 248),
+      border: k.rgb(2, 132, 199)
+    };
+  } else {
+    // Default: Midnight Purple
+    return {
+      primary: k.rgb(168, 85, 247),
+      secondary: k.rgb(217, 70, 239),
+      border: k.rgb(217, 70, 239)
+    };
+  }
+}
+
 export function makeButton(k, text, pos, onClick, width = 220, height = 52) {
+  const theme = getGameThemeColors(k);
   const btn = k.add([
     k.rect(width, height, { radius: 6 }),
     k.pos(pos),
     k.anchor("center"),
-    k.color(16, 185, 129),
-    k.outline(3, k.rgb(168, 85, 247)),
+    k.color(theme.primary),
+    k.outline(3, theme.border),
     k.area(),
     k.scale(1),
     "btn"

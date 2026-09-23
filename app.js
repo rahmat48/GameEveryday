@@ -542,22 +542,30 @@ function updateFavicon(colorHex) {
 
 function setTheme(theme) {
     document.body.className = '';
-    if (theme === 'purple') {
-        document.body.classList.add('theme-purple');
-        currentBg = '#0b0114';
-        currentColor = '#d946ef';
-        updateFavicon('#d946ef');
+    localStorage.setItem('hub_selected_theme', theme);
+
+    if (theme === 'green') {
+        document.body.classList.add('theme-green');
+        currentBg = '#050505';
+        currentColor = '#00ff41';
+        updateFavicon('#00ff41');
     } else if (theme === 'light') {
         document.body.classList.add('theme-light');
         currentBg = '#f1f5f9';
         currentColor = '#0284c7';
         updateFavicon('#0284c7');
     } else {
-        currentBg = '#050505';
-        currentColor = '#00ff41';
-        updateFavicon('#00ff41');
+        // Default: Midnight Purple
+        document.body.classList.add('theme-purple');
+        currentBg = '#0b0114';
+        currentColor = '#d946ef';
+        updateFavicon('#d946ef');
     }
 }
+
+// Inisialisasi tema default Midnight Purple atau dari pilihan tersimpan
+const initialTheme = localStorage.getItem('hub_selected_theme') || 'purple';
+setTheme(initialTheme);
 
 // Floating Theme Click Logic (No mouseleave auto-close)
 const themeOptions = document.getElementById('theme-options');
