@@ -112,6 +112,66 @@ async function openLeaderboard(gameId, gameTitle) {
     }
 }
 
+// Flight Hours Global Leaderboard
+async function openFlightHoursLeaderboard() {
+    const modal = document.getElementById('leaderboard-modal');
+    const overlay = document.getElementById('leaderboard-overlay');
+    const titleEl = document.getElementById('lb-game-name');
+    const listEl = document.getElementById('lb-list-container');
+    if (!modal) return;
+
+    if (titleEl) titleEl.innerText = `⏱ LEADERBOARD JAM TERBANG`;
+    if (listEl) listEl.innerHTML = '<p style="text-align: center; opacity: 0.7;">Memuat peringkat jam terbang komandan...</p>';
+
+    modal.style.display = 'block';
+    if (overlay) overlay.style.display = 'block';
+
+    try {
+        const snap = await db.ref('users').once('value');
+        const users = snap.val() || {};
+        const entries = [];
+
+        Object.keys(users).forEach(uid => {
+            const u = users[uid];
+            const secs = u.totalPlayTime || 0;
+            if (secs > 0) {
+                entries.push({
+                    name: u.name || 'Commander',
+                    avatar: u.avatar || '🚀',
+                    totalSeconds: secs
+                });
+            }
+        });
+
+        entries.sort((a, b) => b.totalSeconds - a.totalSeconds);
+
+        if (entries.length === 0) {
+            listEl.innerHTML = '<p style="text-align: center; opacity: 0.6; padding: 10px;">Belum ada catatan jam terbang.</p>';
+            return;
+        }
+
+        let html = '<div style="display:flex; flex-direction:column; gap:8px;">';
+        entries.slice(0, 10).forEach((entry, i) => {
+            const rankIcon = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : `#${i+1}`));
+            const h = Math.floor(entry.totalSeconds / 3600);
+            const m = Math.floor((entry.totalSeconds % 3600) / 60);
+            const s = entry.totalSeconds % 60;
+            const timeStr = h > 0 ? `${h}j ${m}m` : (m > 0 ? `${m}m ${s}s` : `${s}s`);
+
+            html += `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.15); padding: 6px 4px;">
+                    <span>${rankIcon} ${entry.avatar} ${entry.name}</span>
+                    <strong style="color: #f59e0b;">${timeStr}</strong>
+                </div>
+            `;
+        });
+        html += '</div>';
+        listEl.innerHTML = html;
+    } catch (err) {
+        listEl.innerHTML = `<p style="text-align: center; color: #ef4444;">Gagal memuat: ${err.message}</p>`;
+    }
+}
+
 function closeLeaderboardModal() {
     const modal = document.getElementById('leaderboard-modal');
     const overlay = document.getElementById('leaderboard-overlay');
