@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['email'])",
+        "email": {
+          ".validate": "newData.isString()"
+        },
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "avatar": {
+          ".validate": "newData.isString() && newData.val().length <= 5"
+        },
+        "highScore": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "gamesPlayed": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "totalPlayTime": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "battleMTK": {
+          "highScore": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "stages": {
+            "$stage": {
+              ".validate": "newData.hasChildren(['score', 'stars'])",
+              "score": { ".validate": "newData.isNumber()" },
+              "stars": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3" },
+              "bestCombo": { ".validate": "newData.isNumber() && newData.val() >= 0" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
