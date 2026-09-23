@@ -511,6 +511,10 @@ let audioCtx = null;
 let isAudioMuted = localStorage.getItem('hub_audio_muted') === 'true';
 let ambientOsc = null;
 let ambientGain = null;
+let bgmInterval = null;
+
+// Nada Arpeggio Sci-Fi Space Melodi (Hz)
+const spaceScale = [220, 261.63, 329.63, 392, 440, 523.25, 659.25, 783.99]; // Am pentatonic
 
 function initAudioContext() {
     if (!audioCtx) {
@@ -538,8 +542,10 @@ function toggleAudio() {
 
     if (isAudioMuted) {
         stopAmbientSound();
+        stopSpaceBgm();
     } else {
         playAmbientSound();
+        startSpaceBgm();
         playRetroClickSound();
     }
 }
@@ -578,10 +584,10 @@ function playAmbientSound() {
         ambientGain = audioCtx.createGain();
 
         ambientOsc.type = 'sine';
-        ambientOsc.frequency.setValueAtTime(55, audioCtx.currentTime); // Low space hum
+        ambientOsc.frequency.setValueAtTime(55, audioCtx.currentTime);
 
         ambientGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-        ambientGain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 1.5);
+        ambientGain.gain.linearRampToValueAtTime(0.025, audioCtx.currentTime + 1.5);
 
         ambientOsc.connect(ambientGain);
         ambientGain.connect(audioCtx.destination);
@@ -609,8 +615,57 @@ function stopAmbientSound() {
     }
 }
 
-// Inisialisasi status tombol audio awal
+// Chiptune / Synthwave Ambient BGM Generator
+let noteIndex = 0;
+function playBgmNote() {
+    if (isAudioMuted || !audioCtx) return;
+
+    try {
+        const freq = spaceScale[noteIndex % spaceScale.length];
+        noteIndex = (noteIndex + (Math.random() > 0.3 ? 1 : 2)) % spaceScale.length;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+    } catch (e) {}
+}
+
+function startSpaceBgm() {
+    if (bgmInterval || isAudioMuted) return;
+    playBgmNote();
+    bgmInterval = setInterval(playBgmNote, 350); // Tempo melodi sci-fi
+}
+
+function stopSpaceBgm() {
+    if (bgmInterval) {
+        clearInterval(bgmInterval);
+        bgmInterval = null;
+    }
+}
+
+// Inisialisasi status audio awal
 updateMuteButtonUI();
+
+// Auto-start audio pada interaksi pertama jika tidak mute
+document.addEventListener('click', () => {
+    if (!isAudioMuted && (!audioCtx || audioCtx.state === 'suspended' || !bgmInterval)) {
+        initAudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        playAmbientSound();
+        startSpaceBgm();
+    }
+}, { once: true });
 
 // Putar efek klik pada tombol
 document.addEventListener('click', (e) => {
