@@ -473,19 +473,29 @@ function typeEffect() {
 typeEffect();
 
 // Theme Changer
+function updateFavicon(colorHex) {
+    const favicon = document.getElementById('dynamic-favicon');
+    if (!favicon) return;
+    const cleanHex = encodeURIComponent(colorHex);
+    favicon.href = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${cleanHex}'><path d='M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/></svg>`;
+}
+
 function setTheme(theme) {
     document.body.className = '';
     if (theme === 'purple') {
         document.body.classList.add('theme-purple');
         currentBg = '#0b0114';
         currentColor = '#d946ef';
+        updateFavicon('#d946ef');
     } else if (theme === 'light') {
         document.body.classList.add('theme-light');
         currentBg = '#f1f5f9';
         currentColor = '#0284c7';
+        updateFavicon('#0284c7');
     } else {
         currentBg = '#050505';
         currentColor = '#00ff41';
+        updateFavicon('#00ff41');
     }
 }
 
