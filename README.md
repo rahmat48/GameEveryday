@@ -3,6 +3,10 @@
 > **Satu Game Web Baru Bertema Retro Sci-Fi Setiap Hari!**  
 > Dibuat dengan cinta, piksel, dan semangat eksplorasi antariksa.
 
+🌐 **Akses Website & Mainkan Sekarang:**  
+👉 **[https://game.rahmatdwi.my.id](https://game.rahmatdwi.my.id)**  
+*(Mirror GitHub Pages: [https://rahmat48.github.io/GameEveryday](https://rahmat48.github.io/GameEveryday))*
+
 ---
 
 ## 🌌 Tentang Proyek
