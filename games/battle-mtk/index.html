@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#22c55e">
+  <title>Battle MTK - Space Game Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div id="hud-top">
+    <div id="commander-info">Commander</div>
+    <button id="btn-back" onclick="window.location.href='../../index.html'">BACK</button>
+  </div>
+
+  <div id="game-container"></div>
+
+  <script>
+    const commanderName = localStorage.getItem('user_name') || 'Commander';
+    const commanderAvatar = localStorage.getItem('user_avatar') || '🚀';
+    const infoEl = document.getElementById('commander-info');
+    if (infoEl) {
+      infoEl.textContent = `${commanderAvatar} ${commanderName}`;
+    }
+  </script>
+  <script type="module" src="./js/game.js"></script>
+</body>
+</html>

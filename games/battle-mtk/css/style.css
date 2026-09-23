@@ -1,0 +1,121 @@
+:root {
+  --green: #22c55e;
+  --purple: #a855f7;
+  --bg: #0a0a1a;
+  --bg-panel: rgba(10, 10, 26, 0.85);
+  --text: #e0e0ff;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 4px,
+    rgba(0, 0, 0, 0.12) 4px,
+    rgba(0, 0, 0, 0.12) 6px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+#hud-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--green);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--green);
+  z-index: 10;
+}
+
+#hud-top button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  background: transparent;
+  color: var(--green);
+  border: 1px solid var(--green);
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#hud-top button:hover {
+  background: var(--green);
+  color: var(--bg);
+  box-shadow: 0 0 10px var(--green);
+}
+
+#game-container {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  position: relative;
+  z-index: 1;
+}
+
+#game-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 0 24px var(--green);
+  border: 1px solid var(--green);
+}
+
+body.theme-purple {
+  --green: #a855f7;
+  --bg: #0d061a;
+  --bg-panel: rgba(13, 6, 26, 0.85);
+  --text: #f3e8ff;
+}
+
+body.theme-light {
+  --green: #0284c7;
+  --bg: #f8fafc;
+  --bg-panel: rgba(248, 250, 252, 0.9);
+  --text: #0f172a;
+}
+
+@media (max-width: 600px) {
+  #hud-top {
+    font-size: 8px;
+    padding: 0 8px;
+    height: 48px;
+  }
+}
