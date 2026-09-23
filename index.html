@@ -54,14 +54,20 @@
     </div>
     <div id="modal-overlay" onclick="closeAuthModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;"></div>
 
-    <!-- Floating Theme Selector Trigger -->
-    <div id="theme-floating-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000;">
-        <div id="theme-options" style="display: none; position: absolute; bottom: 45px; right: 0; background: rgba(5,5,5,0.95); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; flex-direction: column; gap: 8px; min-width: 140px; box-shadow: 0 0 15px var(--glow-color);">
-            <button onclick="setTheme('green')" style="border: none; background: transparent; color: #00ff41; text-align: left; cursor: pointer; padding: 5px;">Cyber Matrix</button>
-            <button onclick="setTheme('purple')" style="border: none; background: transparent; color: #d946ef; text-align: left; cursor: pointer; padding: 5px;">Midnight Purple</button>
-            <button onclick="setTheme('light')" style="border: none; background: transparent; color: #0284c7; text-align: left; cursor: pointer; padding: 5px;">Supernova Light</button>
+    <!-- Floating Controls (Mute & Theme) -->
+    <div id="floating-controls-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; align-items: center; gap: 12px;">
+        <!-- Audio Mute Button -->
+        <button id="audio-toggle-btn" onclick="toggleAudio()" style="width: 35px; height: 35px; border-radius: 50%; background: var(--bg-color); border: 2px solid var(--border-color); color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; padding: 0; box-shadow: 0 0 10px var(--glow-color);" title="Mute/Unmute Audio">🔊</button>
+
+        <!-- Theme Selector Trigger -->
+        <div id="theme-floating-container" style="position: relative;">
+            <div id="theme-options" style="display: none; position: absolute; bottom: 45px; right: 0; background: rgba(5,5,5,0.95); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; flex-direction: column; gap: 8px; min-width: 140px; box-shadow: 0 0 15px var(--glow-color);">
+                <button onclick="setTheme('green')" style="border: none; background: transparent; color: #00ff41; text-align: left; cursor: pointer; padding: 5px;">Cyber Matrix</button>
+                <button onclick="setTheme('purple')" style="border: none; background: transparent; color: #d946ef; text-align: left; cursor: pointer; padding: 5px;">Midnight Purple</button>
+                <button onclick="setTheme('light')" style="border: none; background: transparent; color: #0284c7; text-align: left; cursor: pointer; padding: 5px;">Supernova Light</button>
+            </div>
+            <div id="theme-trigger" onclick="toggleThemeMenu()" style="width: 35px; height: 35px; border-radius: 50%; background: var(--border-color); border: 2px solid #fff; cursor: pointer; box-shadow: 0 0 10px var(--glow-color);" title="Ganti Tema"></div>
         </div>
-        <div id="theme-trigger" onclick="toggleThemeMenu()" style="width: 35px; height: 35px; border-radius: 50%; background: var(--border-color); border: 2px solid #fff; cursor: pointer; box-shadow: 0 0 10px var(--glow-color);"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>

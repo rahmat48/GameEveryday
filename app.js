@@ -506,6 +506,119 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Retro Sci-Fi Audio Synthesizer (Web Audio API)
+let audioCtx = null;
+let isAudioMuted = localStorage.getItem('hub_audio_muted') === 'true';
+let ambientOsc = null;
+let ambientGain = null;
+
+function initAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function updateMuteButtonUI() {
+    const btn = document.getElementById('audio-toggle-btn');
+    if (btn) {
+        btn.innerText = isAudioMuted ? '🔇' : '🔊';
+        btn.style.opacity = isAudioMuted ? '0.6' : '1';
+    }
+}
+
+function toggleAudio() {
+    initAudioContext();
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+
+    isAudioMuted = !isAudioMuted;
+    localStorage.setItem('hub_audio_muted', String(isAudioMuted));
+    updateMuteButtonUI();
+
+    if (isAudioMuted) {
+        stopAmbientSound();
+    } else {
+        playAmbientSound();
+        playRetroClickSound();
+    }
+}
+
+function playRetroClickSound() {
+    if (isAudioMuted) return;
+    initAudioContext();
+    if (!audioCtx) return;
+
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+    } catch (e) {}
+}
+
+function playAmbientSound() {
+    if (isAudioMuted || ambientOsc) return;
+    initAudioContext();
+    if (!audioCtx) return;
+
+    try {
+        ambientOsc = audioCtx.createOscillator();
+        ambientGain = audioCtx.createGain();
+
+        ambientOsc.type = 'sine';
+        ambientOsc.frequency.setValueAtTime(55, audioCtx.currentTime); // Low space hum
+
+        ambientGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        ambientGain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 1.5);
+
+        ambientOsc.connect(ambientGain);
+        ambientGain.connect(audioCtx.destination);
+
+        ambientOsc.start();
+    } catch (e) {}
+}
+
+function stopAmbientSound() {
+    if (ambientGain && audioCtx) {
+        try {
+            ambientGain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            setTimeout(() => {
+                if (ambientOsc) {
+                    ambientOsc.stop();
+                    ambientOsc.disconnect();
+                    ambientOsc = null;
+                }
+            }, 300);
+        } catch (e) {
+            ambientOsc = null;
+        }
+    } else if (ambientOsc) {
+        ambientOsc = null;
+    }
+}
+
+// Inisialisasi status tombol audio awal
+updateMuteButtonUI();
+
+// Putar efek klik pada tombol
+document.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON' && e.target.id !== 'audio-toggle-btn') {
+        playRetroClickSound();
+    }
+});
+
 // Pixel Preview Animation for Landing Page
 function initPreviewAnimation() {
     const pCanvas = document.getElementById('preview-anim-canvas');
