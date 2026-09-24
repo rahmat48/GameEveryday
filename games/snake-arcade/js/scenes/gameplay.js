@@ -89,21 +89,21 @@ export function gameplayScene(k) {
 
     // HUD Header Gameplay
     const scoreText = k.add([
-      k.text("SCORE: 0", { size: 18, font: "monospace" }),
+      k.text("SKOR: 0", { size: 18, font: "monospace" }),
       k.pos(OFFSET_X, 45),
       k.color(34, 197, 94),
       k.z(50)
     ]);
 
     const lengthText = k.add([
-      k.text("LEN: 3", { size: 18, font: "monospace" }),
-      k.pos(OFFSET_X + 160, 45),
+      k.text("PANJANG: 3", { size: 18, font: "monospace" }),
+      k.pos(OFFSET_X + 140, 45),
       k.color(56, 189, 248),
       k.z(50)
     ]);
 
     const speedText = k.add([
-      k.text("SPD: 5.0", { size: 18, font: "monospace" }),
+      k.text("SPEED: 5.0", { size: 18, font: "monospace" }),
       k.pos(OFFSET_X + 280, 45),
       k.color(245, 158, 11),
       k.z(50)
@@ -366,10 +366,10 @@ export function gameplayScene(k) {
       }
 
       // Update Teks HUD
-      scoreText.text = `SCORE: ${state.score}`;
-      lengthText.text = `LEN: ${state.length}`;
+      scoreText.text = `SKOR: ${state.score}`;
+      lengthText.text = `PANJANG: ${state.length}`;
       const effectiveSpd = state.slowmoTimer > 0 ? (state.speed * 0.5) : state.speed;
-      speedText.text = `SPD: ${effectiveSpd.toFixed(1)}`;
+      speedText.text = `SPEED: ${effectiveSpd.toFixed(1)}`;
 
       renderSnake();
     }

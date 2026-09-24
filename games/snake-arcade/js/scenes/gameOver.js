@@ -73,7 +73,7 @@ export function gameOverScene(k) {
     ]);
 
     // Tombol Navigasi
-    makeButton(k, "RETRY", k.vec2(400, 420), () => {
+    makeButton(k, "COBA LAGI", k.vec2(400, 420), () => {
       k.go("gameplay");
     }, 220, 46);
 
@@ -81,7 +81,7 @@ export function gameOverScene(k) {
       k.go("menu");
     }, 220, 46);
 
-    makeButton(k, "EXIT HUB", k.vec2(400, 540), () => {
+    makeButton(k, "KELUAR", k.vec2(400, 540), () => {
       window.location.href = "../../dashboard.html";
     }, 220, 46);
   });

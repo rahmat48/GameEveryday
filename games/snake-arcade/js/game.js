@@ -5,6 +5,7 @@
 
 import kaplay from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
 import { menuScene } from "./scenes/menu.js";
+import { howToPlayScene } from "./scenes/howToPlay.js";
 import { gameplayScene } from "./scenes/gameplay.js";
 import { gameOverScene } from "./scenes/gameOver.js";
 import { initAudio } from "./audio.js";
@@ -25,6 +26,7 @@ k.loadRoot("./assets/img/");
 
 // Registrasi Seluruh Scene
 menuScene(k);
+howToPlayScene(k);
 gameplayScene(k);
 gameOverScene(k);
 

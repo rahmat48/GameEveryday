@@ -62,8 +62,8 @@ export function menuScene(k) {
       k.go("gameplay");
     }, 240, 46);
 
-    makeButton(k, "HOW TO PLAY", k.vec2(400, 350), () => {
-      showHowToPlay();
+    makeButton(k, "CARA MAIN", k.vec2(400, 350), () => {
+      k.go("howToPlay");
     }, 240, 46);
 
     makeButton(k, "HIGH SCORE", k.vec2(400, 410), () => {
@@ -73,51 +73,6 @@ export function menuScene(k) {
     makeButton(k, "EXIT", k.vec2(400, 470), () => {
       window.location.href = "../../dashboard.html";
     }, 240, 46);
-
-    // Overlay HOW TO PLAY
-    function showHowToPlay() {
-      const panel = retroPanel(k, k.vec2(400, 300), 540, 380);
-      
-      panel.add([
-        k.text("INSTRUKSI MISI", { size: 20, font: "monospace" }),
-        k.pos(0, -140),
-        k.anchor("center"),
-        k.color(34, 197, 94)
-      ]);
-
-      const lines = [
-        "1. KONTROL: WASD / Arrow Keys (Desktop)",
-        "   Swipe / On-Screen D-Pad (Mobile)",
-        "2. MAKAN BYTE UNGU untuk tambah skor & panjang",
-        "3. KECEPATAN NAIK setiap 5 byte dimakan",
-        "4. POWER-UP:",
-        "   - BIRU: Slow-mo (perlambat kecepatan)",
-        "   - EMAS: Ghost (tembus tubuh worm)",
-        "5. HINDARI MENABRAK TUBUH SENDIRI!"
-      ];
-
-      lines.forEach((line, idx) => {
-        panel.add([
-          k.text(line, { size: 14, font: "monospace" }),
-          k.pos(-240, -90 + (idx * 28)),
-          k.color(224, 224, 255)
-        ]);
-      });
-
-      const closeBtn = panel.add([
-        k.rect(120, 36, { radius: 4 }),
-        k.pos(0, 140),
-        k.anchor("center"),
-        k.color(239, 68, 68),
-        k.area()
-      ]);
-      closeBtn.add([
-        k.text("TUTUP", { size: 16, font: "monospace" }),
-        k.anchor("center"),
-        k.color(255, 255, 255)
-      ]);
-      closeBtn.onClick(() => panel.destroy());
-    }
 
     // Overlay HIGH SCORE
     function showHighScore(p) {
