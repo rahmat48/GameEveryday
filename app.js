@@ -940,33 +940,85 @@ function initCardPreviewAnim(canvasId, title) {
             return;
         }
 
-        // Animasi karakter pesawat / icon
-        x = 50 + Math.sin(Date.now() / 300) * 15;
-        y = 65 + Math.cos(Date.now() / 250) * 10;
+        // Variasi preview kartu Battle MTK (Duel Matematika)
+        // Persoalan matematika retro berulang (contoh: 7 x 8 = 56, 12 + 15 = 27)
+        const mathProblems = [
+            { q: "7 x 8 = ?", ans: "56", opt: ["48", "56", "64"] },
+            { q: "15 + 9 = ?", ans: "24", opt: ["24", "22", "26"] },
+            { q: "45 / 5 = ?", ans: "9", opt: ["8", "9", "7"] },
+            { q: "12 - 7 = ?", ans: "5", opt: ["6", "5", "4"] }
+        ];
 
-        ctx.fillStyle = '#00ff41';
-        ctx.font = '24px monospace';
-        ctx.fillText('🚀', x, y);
+        const pIdx = Math.floor(Date.now() / 2400) % mathProblems.length;
+        const curProb = mathProblems[pIdx];
+        const cycleProgress = (Date.now() % 2400) / 2400;
 
-        // Monster matematika bergerak
-        const bossX = 200 + Math.sin(Date.now() / 400) * 12;
-        const bossY = 65 + Math.cos(Date.now() / 300) * 12;
-        ctx.fillStyle = '#a855f7';
-        ctx.font = '22px monospace';
-        ctx.fillText('👾', bossX, bossY);
-
-        // Efek proyektil laser berulang
-        const laserProg = (Date.now() % 1200) / 1200;
-        const lx = x + 25 + laserProg * (bossX - x);
-        const ly = y - 6;
-        ctx.fillStyle = '#f59e0b';
-        ctx.fillRect(lx, ly, 10, 3);
-
-        // Label nama misi
+        // Label status simulator
         ctx.fillStyle = '#38bdf8';
         ctx.font = '10px monospace';
-        ctx.fillText('SIMULASI LIVE', 12, 20);
+        ctx.fillText('MATH BATTLE SIM', 12, 18);
 
+        // Header Soal di tengah atas
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = 'bold 15px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(curProb.q, c.width / 2, 38);
+
+        // Karakter Pesawat Komandan (Kiri)
+        const shipX = 35;
+        const shipY = 82 + Math.sin(Date.now() / 300) * 6;
+        ctx.font = '22px monospace';
+        ctx.fillText('🚀', shipX, shipY);
+
+        // Monster Matematika (Kanan)
+        const monsterX = 245;
+        const monsterY = 82 + Math.cos(Date.now() / 350) * 6;
+        ctx.fillText('👾', monsterX, monsterY);
+
+        // Tiga Kotak Pilihan Jawaban
+        const boxWidth = 36;
+        const boxHeight = 22;
+        const startX = 85;
+        const optY = 72;
+
+        curProb.opt.forEach((optText, i) => {
+            const bx = startX + i * 44;
+            const isCorrect = optText === curProb.ans;
+
+            // Highlight tombol yang dipilih pesawat saat laser menembak
+            if (isCorrect && cycleProgress > 0.45 && cycleProgress < 0.85) {
+                ctx.fillStyle = 'rgba(34, 197, 94, 0.35)';
+                ctx.strokeStyle = '#22c55e';
+            } else {
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                ctx.strokeStyle = '#64748b';
+            }
+
+            ctx.lineWidth = 1;
+            ctx.fillRect(bx, optY, boxWidth, boxHeight);
+            ctx.strokeRect(bx, optY, boxWidth, boxHeight);
+
+            ctx.fillStyle = isCorrect && cycleProgress > 0.45 && cycleProgress < 0.85 ? '#22c55e' : '#cbd5e1';
+            ctx.font = 'bold 12px monospace';
+            ctx.fillText(optText, bx + boxWidth / 2, optY + 15);
+        });
+
+        // Laser Jawaban Benar menembak ke arah Monster
+        if (cycleProgress > 0.45 && cycleProgress < 0.85) {
+            const shootProg = (cycleProgress - 0.45) / 0.4;
+            const lx = 160 + shootProg * (monsterX - 160);
+            ctx.fillStyle = '#00ff41';
+            ctx.fillRect(lx, 80, 12, 3);
+
+            // Efek Hit saat mendekati monster
+            if (shootProg > 0.75) {
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 11px monospace';
+                ctx.fillText('CRIT!', monsterX, monsterY - 14);
+            }
+        }
+
+        ctx.textAlign = 'left'; // Reset alignment
         requestAnimationFrame(render);
     }
     render();
