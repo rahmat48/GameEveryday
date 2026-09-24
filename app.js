@@ -50,7 +50,7 @@ async function loadGames() {
         const releaseDate = game.releaseDate || game.date || '';
         const canvasId = `card-anim-${idx}`;
         card.innerHTML = `
-            <canvas id="${canvasId}" width="280" height="130" style="width: 100%; height: 130px; background: #070714; border: 1px dashed var(--border-color); border-radius: 4px; display: block; margin-bottom: 12px; cursor: pointer;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')"></canvas>
+            <canvas id="${canvasId}" width="280" height="130" style="width: 100%; height: 130px; background: #070714; border: 2px solid var(--border-color); box-shadow: 0 0 10px var(--glow-color); border-radius: 6px; display: block; margin-bottom: 12px; cursor: pointer; box-sizing: border-box;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')"></canvas>
             <h3 style="cursor: pointer;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')">${game.title}</h3>
             <p>${game.description}</p>
             <div class="card-actions">
