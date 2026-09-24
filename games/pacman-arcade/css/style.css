@@ -1,0 +1,261 @@
+:root {
+  --yellow: #facc15;
+  --green: #22c55e;
+  --purple: #a855f7;
+  --cyan: #00d4ff;
+  --bg: #060614;
+  --bg-panel: rgba(10, 10, 26, 0.88);
+  --text: #e0e0ff;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --border-maze: #2563eb;
+  --glow-maze: rgba(37, 99, 235, 0.4);
+}
+
+/* Theme Variasi */
+body.theme-green {
+  --border-maze: #059669;
+  --glow-maze: rgba(5, 150, 105, 0.4);
+}
+
+body.theme-purple {
+  --green: #d946ef;
+  --cyan: #a855f7;
+  --border-maze: #9333ea;
+  --glow-maze: rgba(147, 51, 234, 0.4);
+}
+
+body.theme-light {
+  --bg: #f0f4f8;
+  --bg-panel: rgba(240, 244, 248, 0.95);
+  --text: #0f172a;
+  --green: #0284c7;
+  --cyan: #0284c7;
+  --border-maze: #2563eb;
+  --glow-maze: rgba(37, 99, 235, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* CRT Scanline Overlay */
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 4px,
+    rgba(0, 0, 0, 0.15) 4px,
+    rgba(0, 0, 0, 0.15) 6px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+#hud-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  background: var(--bg-panel);
+  border-bottom: 2px solid var(--border-maze);
+  box-shadow: 0 0 12px var(--glow-maze);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  z-index: 10;
+}
+
+#commander-info {
+  color: var(--text);
+  text-shadow: 0 0 6px var(--yellow);
+}
+
+.hud-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#btn-mute, #btn-dpad, #btn-back {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#btn-mute {
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+}
+
+#btn-mute:hover {
+  background: var(--cyan);
+  color: #000;
+}
+
+#btn-dpad {
+  color: var(--yellow);
+  border: 1px solid var(--yellow);
+}
+
+#btn-dpad:hover {
+  background: var(--yellow);
+  color: #000;
+}
+
+#btn-back {
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+#btn-back:hover {
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
+}
+
+#game-container {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  z-index: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #04040d;
+  box-shadow: 0 0 24px var(--glow-maze);
+  border: 2px solid var(--border-maze);
+  border-radius: 6px;
+  margin-top: 56px;
+}
+
+#game-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  display: block;
+}
+
+/* Mobile Virtual D-Pad Overlay (Ergonomic Bottom-Right Corner) */
+#virtual-dpad {
+  display: none;
+  position: fixed;
+  bottom: 18px;
+  right: 20px;
+  left: auto;
+  transform: none;
+  width: 130px;
+  height: 130px;
+  z-index: 150;
+  pointer-events: none;
+  opacity: 0.82;
+  transition: opacity 0.2s ease;
+}
+
+#virtual-dpad:hover,
+#virtual-dpad:active {
+  opacity: 1;
+}
+
+.dpad-btn {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1.5px solid rgba(250, 204, 21, 0.7);
+  color: var(--yellow);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.25);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: background 0.1s, transform 0.1s;
+}
+
+.dpad-btn:active {
+  background: var(--yellow);
+  color: #060614;
+  transform: scale(0.92);
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.6);
+}
+
+#dpad-up { top: 0; left: 45px; }
+#dpad-down { bottom: 0; left: 45px; }
+#dpad-left { top: 45px; left: 0; }
+#dpad-right { top: 45px; right: 0; }
+
+#virtual-dpad.visible {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  #hud-top {
+    padding: 0 10px;
+    height: 48px;
+    font-size: 9px;
+  }
+  #btn-mute, #btn-dpad, #btn-back {
+    font-size: 8px;
+    padding: 6px 8px;
+  }
+  #virtual-dpad {
+    bottom: 12px;
+    right: 12px;
+    width: 120px;
+    height: 120px;
+  }
+  .dpad-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 11px;
+  }
+  #dpad-up { top: 0; left: 42px; }
+  #dpad-down { bottom: 0; left: 42px; }
+  #dpad-left { top: 42px; left: 0; }
+  #dpad-right { top: 42px; right: 0; }
+}

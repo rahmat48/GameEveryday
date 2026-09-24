@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#facc15">
+  <title>Pacman Arcade - Space Game Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css?v=1">
+
+  <!-- Sentry Error Tracking -->
+  <script src="https://browser.sentry-cdn.com/7.114.0/bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    if (window.Sentry) {
+      const isProduction = window.location.hostname === 'game.rahmatdwi.my.id';
+      Sentry.init({
+        dsn: window.SENTRY_DSN || "",
+        environment: isProduction ? 'production' : 'development'
+      });
+      Sentry.setTag('game', 'pacman-arcade');
+    }
+  </script>
+</head>
+<body>
+  <div id="hud-top">
+    <div id="commander-info">🚀 Commander</div>
+    <div class="hud-actions">
+      <button id="btn-dpad" title="Tampilkan/Sembunyikan D-Pad Virtual" style="display: none;">🎮 DPAD</button>
+      <button id="btn-mute" title="Matikan / Hidupkan Suara">🔊 SUARA</button>
+      <button id="btn-back" onclick="window.location.href='../../dashboard.html'">BACK</button>
+    </div>
+  </div>
+
+  <div id="game-container">
+    <!-- Canvas Kaplay akan ter-mount di sini -->
+  </div>
+
+  <!-- Virtual D-Pad untuk Mobile / Layar Sentuh -->
+  <div id="virtual-dpad">
+    <button class="dpad-btn" id="dpad-up" data-dir="up">▲</button>
+    <button class="dpad-btn" id="dpad-down" data-dir="down">▼</button>
+    <button class="dpad-btn" id="dpad-left" data-dir="left">◀</button>
+    <button class="dpad-btn" id="dpad-right" data-dir="right">▶</button>
+  </div>
+
+  <script>
+    const savedTheme = localStorage.getItem('hub_selected_theme') || 'green';
+    document.body.className = `theme-${savedTheme}`;
+
+    const commanderName = localStorage.getItem('user_name') || 'Commander';
+    const commanderAvatar = localStorage.getItem('user_avatar') || '🚀';
+    const infoEl = document.getElementById('commander-info');
+    if (infoEl) {
+      infoEl.textContent = `${commanderAvatar} ${commanderName}`;
+    }
+  </script>
+  <script type="module">
+    import { toggleMute, isMuted } from "./js/audio.js";
+    const muteBtn = document.getElementById("btn-mute");
+    if (muteBtn) {
+      const updateLabel = () => {
+        muteBtn.textContent = isMuted() ? "🔇 MUTE" : "🔊 SUARA";
+      };
+      updateLabel();
+      muteBtn.onclick = () => {
+        toggleMute();
+        updateLabel();
+      };
+    }
+  </script>
+  <script type="module" src="./js/game.js?v=1"></script>
+</body>
+</html>
