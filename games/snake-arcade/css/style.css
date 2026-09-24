@@ -115,59 +115,100 @@ body::after {
   display: none;
 }
 
+#mobile-controller.force-show {
+  display: grid !important;
+  grid-template-columns: repeat(3, 60px);
+  grid-template-rows: repeat(3, 60px);
+  gap: 8px;
+  padding: 10px;
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+  background: rgba(10, 10, 26, 0.75);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 16px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.dpad-btn {
+  width: 60px;
+  height: 60px;
+  background: rgba(34, 197, 94, 0.2);
+  border: 2px solid var(--green);
+  border-radius: 12px;
+  color: var(--green);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  transition: transform 0.08s, background 0.08s;
+}
+
+.dpad-btn:active {
+  transform: scale(0.9);
+  background: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.9);
+}
+
+.dpad-empty {
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+}
+
 @media (max-width: 768px) {
+  body {
+    justify-content: flex-start;
+  }
+
   #game-container {
-    max-height: 55vh;
+    max-height: 48vh;
+    margin-top: 56px;
+    margin-bottom: 0;
   }
 
   #game-container canvas {
-    max-height: 55vh;
+    max-height: 48vh;
   }
 
   #mobile-controller {
     display: grid;
-    grid-template-columns: repeat(3, 64px);
-    grid-template-rows: repeat(3, 64px);
-    gap: 8px;
-    padding: 12px;
+    grid-template-columns: repeat(3, 56px);
+    grid-template-rows: repeat(3, 56px);
+    gap: 6px;
+    padding: 8px;
     position: fixed;
-    bottom: 10px;
+    bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 20;
+    z-index: 999;
     justify-content: center;
     align-items: center;
+    background: rgba(10, 10, 26, 0.9);
+    border: 2px solid rgba(34, 197, 94, 0.5);
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
   }
 
   .dpad-btn {
-    width: 64px;
-    height: 64px;
-    background: rgba(34, 197, 94, 0.15);
-    border: 2px solid var(--green);
-    border-radius: 12px;
-    color: var(--green);
-    font-family: 'Press Start 2P', monospace;
-    font-size: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    touch-action: manipulation;
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
-    transition: transform 0.1s, background 0.1s;
-  }
-
-  .dpad-btn:active {
-    transform: scale(0.9);
-    background: rgba(34, 197, 94, 0.4);
-    box-shadow: 0 0 18px rgba(34, 197, 94, 0.8);
+    width: 56px;
+    height: 56px;
+    font-size: 18px;
   }
 
   .dpad-empty {
-    width: 64px;
-    height: 64px;
-    pointer-events: none;
+    width: 56px;
+    height: 56px;
   }
 }
 

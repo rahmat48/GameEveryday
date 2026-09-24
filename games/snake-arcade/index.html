@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/style.css?v=2">
 
   <!-- Sentry Error Tracking -->
   <script src="https://browser.sentry-cdn.com/7.114.0/bundle.min.js" crossorigin="anonymous"></script>
@@ -26,7 +26,10 @@
 <body>
   <div id="hud-top">
     <div id="commander-info">🚀 Commander</div>
-    <button id="btn-back" onclick="window.location.href='../../dashboard.html'">BACK</button>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button id="btn-toggle-dpad" title="Tampilkan/Sembunyikan D-Pad Virtual" style="font-family: 'Press Start 2P', monospace; font-size: 10px; padding: 8px 12px; background: transparent; color: var(--green); border: 1px solid var(--green); border-radius: 4px; cursor: pointer;">🕹️ DPAD</button>
+      <button id="btn-back" onclick="window.location.href='../../dashboard.html'">BACK</button>
+    </div>
   </div>
 
   <div id="game-container"></div>
@@ -45,6 +48,6 @@
       infoEl.textContent = `${commanderAvatar} ${commanderName}`;
     }
   </script>
-  <script type="module" src="./js/game.js?v=2"></script>
+  <script type="module" src="./js/game.js?v=4"></script>
 </body>
 </html>

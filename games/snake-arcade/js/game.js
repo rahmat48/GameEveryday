@@ -9,6 +9,10 @@ import { howToPlayScene } from "./scenes/howToPlay.js";
 import { gameplayScene } from "./scenes/gameplay.js";
 import { gameOverScene } from "./scenes/gameOver.js";
 import { initAudio } from "./audio.js";
+import { initMobileController, toggleVirtualDpad } from "./mobileController.js?v=3";
+
+// Pasang toggle ke window global
+window.toggleVirtualDpad = toggleVirtualDpad;
 
 const k = kaplay({
   width: 800,
@@ -40,6 +44,7 @@ k.scene("preload", () => {
   ]);
 
   initAudio(k);
+  initMobileController();
 
   k.wait(1.2, () => {
     k.go("menu");
