@@ -45,9 +45,10 @@ export function gameplayScene(k) {
       isGameOver: false,
       isDying: false,
       isStageClear: false,
+      readyTimer: 3.0, // countdown sebelum game dimulai
       startTime: window.__pacmanCarryStartTime || Date.now(),
       frightenedTimer: 0,
-      globalMode: "scatter", // 'scatter' atau 'chase'
+      globalMode: "scatter",
       modeTimer: 0,
       fruitActive: false,
       fruitTimer: 0,
@@ -435,11 +436,20 @@ export function gameplayScene(k) {
     initSwipe(onDirectionInput);
     updateDpadSceneVisibility(true);
 
+    // Label "READY!" saat countdown
+    const readyLabel = k.add([
+      k.text("READY!", { size: 28, font: "monospace" }),
+      k.pos(400, 300),
+      k.anchor("center"),
+      k.color(250, 204, 21),
+      k.z(100)
+    ]);
+
     // ==========================================
     // LOGIKA PERGERAKAN PACMAN
     // ==========================================
     function updatePacman(dt) {
-      if (state.isPaused || state.isGameOver || state.isDying || state.isStageClear) return;
+      if (state.readyTimer > 0 || state.isPaused || state.isGameOver || state.isDying || state.isStageClear) return;
 
       const currentSpeed = (state.frightenedTimer > 0) ? pacman.speed * 1.1 : pacman.speed;
 
@@ -452,31 +462,26 @@ export function gameplayScene(k) {
       }
 
       // Hitung koordinat sel saat ini
-      const gridX = (pacman.x - OFFSET_X) / CELL_SIZE;
-      const gridY = (pacman.y - OFFSET_Y) / CELL_SIZE;
-      const curCol = Math.floor(gridX);
-      const curRow = Math.floor(gridY);
+      const curCol = Math.floor((pacman.x - OFFSET_X) / CELL_SIZE);
+      const curRow = Math.floor((pacman.y - OFFSET_Y) / CELL_SIZE);
 
       const cellCenterX = OFFSET_X + curCol * CELL_SIZE + CELL_SIZE / 2;
       const cellCenterY = OFFSET_Y + curRow * CELL_SIZE + CELL_SIZE / 2;
       const distToCenterX = pacman.x - cellCenterX;
       const distToCenterY = pacman.y - cellCenterY;
 
-      // Cornering buffer: jika mendekati titik tengah petak, coba belok ke arah buffered
-      const SNAP_TOLERANCE = 4.5;
+      // Cornering: tolerance = kecepatan * 1 frame (16ms) + 2px margin
+      const SNAP_TOLERANCE = currentSpeed * 0.018 + 2;
       if (pacman.bufferedDir !== pacman.dir) {
-        const canTurnHorizontal = (pacman.bufferedDir.x !== 0 && Math.abs(distToCenterY) <= SNAP_TOLERANCE);
-        const canTurnVertical = (pacman.bufferedDir.y !== 0 && Math.abs(distToCenterX) <= SNAP_TOLERANCE);
+        const canTurnH = (pacman.bufferedDir.x !== 0 && Math.abs(distToCenterY) <= SNAP_TOLERANCE);
+        const canTurnV = (pacman.bufferedDir.y !== 0 && Math.abs(distToCenterX) <= SNAP_TOLERANCE);
 
-        if (canTurnHorizontal || canTurnVertical) {
-          const targetCol = curCol + pacman.bufferedDir.x;
-          const targetRow = curRow + pacman.bufferedDir.y;
-          const tile = getTileAt(stageData.map, targetCol, targetRow);
-
-          if (isWalkableForPacman(tile)) {
-            // Snap ke garis tengah dan ubah arah
-            if (canTurnHorizontal) pacman.y = cellCenterY;
-            if (canTurnVertical) pacman.x = cellCenterX;
+        if (canTurnH || canTurnV) {
+          const tCol = curCol + pacman.bufferedDir.x;
+          const tRow = curRow + pacman.bufferedDir.y;
+          if (isWalkableForPacman(getTileAt(stageData.map, tCol, tRow))) {
+            if (canTurnH) pacman.y = cellCenterY;
+            if (canTurnV) pacman.x = cellCenterX;
             pacman.dir = pacman.bufferedDir;
           }
         }
@@ -485,30 +490,21 @@ export function gameplayScene(k) {
       // Cek apakah jalur di depan terhalang tembok
       const nextCol = curCol + pacman.dir.x;
       const nextRow = curRow + pacman.dir.y;
-      const forwardTile = getTileAt(stageData.map, nextCol, nextRow);
-
-      let canMoveForward = isWalkableForPacman(forwardTile);
-
-      // Jika di depan adalah tembok, hentikan pergerakan saat mencapai titik tengah petak
-      if (!canMoveForward) {
-        if (pacman.dir.x > 0 && pacman.x >= cellCenterX) {
-          pacman.x = cellCenterX;
-          canMoveForward = false;
-        } else if (pacman.dir.x < 0 && pacman.x <= cellCenterX) {
-          pacman.x = cellCenterX;
-          canMoveForward = false;
-        } else if (pacman.dir.y > 0 && pacman.y >= cellCenterY) {
-          pacman.y = cellCenterY;
-          canMoveForward = false;
-        } else if (pacman.dir.y < 0 && pacman.y <= cellCenterY) {
-          pacman.y = cellCenterY;
-          canMoveForward = false;
-        }
-      }
+      const canMoveForward = isWalkableForPacman(getTileAt(stageData.map, nextCol, nextRow));
 
       if (canMoveForward) {
         pacman.x += pacman.dir.x * currentSpeed * dt;
         pacman.y += pacman.dir.y * currentSpeed * dt;
+      } else {
+        // Berhenti tepat di center sel agar tidak menembus tembok
+        if (pacman.dir.x > 0 && pacman.x < cellCenterX) pacman.x = Math.min(pacman.x + pacman.dir.x * currentSpeed * dt, cellCenterX);
+        else if (pacman.dir.x < 0 && pacman.x > cellCenterX) pacman.x = Math.max(pacman.x + pacman.dir.x * currentSpeed * dt, cellCenterX);
+        else if (pacman.dir.y > 0 && pacman.y < cellCenterY) pacman.y = Math.min(pacman.y + pacman.dir.y * currentSpeed * dt, cellCenterY);
+        else if (pacman.dir.y < 0 && pacman.y > cellCenterY) pacman.y = Math.max(pacman.y + pacman.dir.y * currentSpeed * dt, cellCenterY);
+        else {
+          if (pacman.dir.x !== 0) pacman.x = cellCenterX;
+          if (pacman.dir.y !== 0) pacman.y = cellCenterY;
+        }
       }
 
       // Warp Tunnel Horizontal (Baris 14)
@@ -602,7 +598,7 @@ export function gameplayScene(k) {
     // LOGIKA PERGERAKAN HANTU (GHOST AI)
     // ==========================================
     function updateGhosts(dt) {
-      if (state.isPaused || state.isGameOver || state.isDying || state.isStageClear) return;
+      if (state.readyTimer > 0 || state.isPaused || state.isGameOver || state.isDying || state.isStageClear) return;
 
       // Siklus Mode Global Scatter / Chase
       state.modeTimer += dt;
@@ -663,16 +659,30 @@ export function gameplayScene(k) {
           ghost.col = curCol;
           ghost.row = curRow;
 
-          ghost.target = getGhostTargetTile(ghost, pacman, blinky, state.globalMode);
+          // Snap ke center untuk presisi
+          ghost.x = cellCenterX;
+          ghost.y = cellCenterY;
+
+          const pacTile = {
+            x: Math.round((pacman.x - OFFSET_X) / CELL_SIZE),
+            y: Math.round((pacman.y - OFFSET_Y) / CELL_SIZE),
+            col: Math.round((pacman.x - OFFSET_X) / CELL_SIZE),
+            row: Math.round((pacman.y - OFFSET_Y) / CELL_SIZE),
+            dir: ghost.dir
+          };
+          const blinkyTile = blinky ? {
+            x: Math.round((blinky.x - OFFSET_X) / CELL_SIZE),
+            y: Math.round((blinky.y - OFFSET_Y) / CELL_SIZE)
+          } : null;
+
+          ghost.target = getGhostTargetTile(ghost, pacTile, blinkyTile, state.globalMode);
           const nextDir = getNextGhostDirection(ghost, ghost.target, stageData.map, ghost.state === "frightened");
 
           if (nextDir) {
             ghost.dir = nextDir;
-            ghost.x = cellCenterX;
-            ghost.y = cellCenterY;
           }
 
-          // Jika hantu mata (eaten) sudah tiba di rumah hantu (col 13, row 11-13)
+          // Jika hantu mata (eaten) sudah tiba di area rumah hantu
           if (ghost.state === "eaten" && curCol >= 12 && curCol <= 15 && curRow >= 11 && curRow <= 14) {
             ghost.state = "leaving";
           }
@@ -816,6 +826,17 @@ export function gameplayScene(k) {
     k.onUpdate(() => {
       const dt = k.dt();
       if (state.isPaused) return;
+
+      // Countdown READY sebelum game mulai
+      if (state.readyTimer > 0) {
+        state.readyTimer -= dt;
+        if (state.readyTimer <= 0) {
+          state.readyTimer = 0;
+          k.destroy(readyLabel);
+          state.startTime = Date.now(); // mulai hitung waktu misi setelah ready
+        }
+        return;
+      }
 
       // Update timer Frightened
       if (state.frightenedTimer > 0) {
