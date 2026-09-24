@@ -180,13 +180,13 @@ export function gameplayScene(k) {
     const ghosts = GHOST_ARRAY.map(cfg => {
       const g = {
         config: cfg,
-        col: cfg.spawnOffset.col,
-        row: cfg.spawnOffset.row,
+        col: Math.floor(cfg.spawnOffset.col),
+        row: Math.floor(cfg.spawnOffset.row),
         x: OFFSET_X + cfg.spawnOffset.col * CELL_SIZE + CELL_SIZE / 2,
         y: OFFSET_Y + cfg.spawnOffset.row * CELL_SIZE + CELL_SIZE / 2,
         dir: DIRS.up,
-        state: cfg.startState, // 'house', 'leaving', 'chase', 'scatter', 'frightened', 'eaten'
-        target: { col: 13, row: 11 },
+        state: cfg.startState,
+        target: { col: 13, row: 11, x: 13, y: 11 },
         houseBounceY: 0,
         obj: null,
         eyesObj: null
@@ -212,6 +212,9 @@ export function gameplayScene(k) {
     });
 
     const blinky = ghosts.find(g => g.config.name === "BLINKY");
+
+    // Debug expose untuk monitoring
+    window.__debugGhosts = ghosts;
 
     // ==========================================
     // ENTITAS BUAH KOSMIK (FRUIT)
@@ -624,17 +627,22 @@ export function gameplayScene(k) {
         }
 
         if (ghost.state === "leaving") {
-          // Meluncur ke pintu gerbang (col: 13.5, row: 11)
-          const targetGateX = OFFSET_X + 13.5 * CELL_SIZE;
-          const targetGateY = OFFSET_Y + 11 * CELL_SIZE;
+          // Meluncur ke titik center tepat di atas pintu gerbang (col 13, row 11)
+          const targetGateX = OFFSET_X + 13 * CELL_SIZE + CELL_SIZE / 2;
+          const targetGateY = OFFSET_Y + 11 * CELL_SIZE + CELL_SIZE / 2;
           const dx = targetGateX - ghost.x;
           const dy = targetGateY - ghost.y;
 
-          if (Math.abs(dx) > 1) {
+          if (Math.abs(dx) > 1.5) {
             ghost.x += Math.sign(dx) * stageData.ghostSpeed * 0.8 * dt;
-          } else if (Math.abs(dy) > 1) {
+          } else if (Math.abs(dy) > 1.5) {
             ghost.y += Math.sign(dy) * stageData.ghostSpeed * 0.8 * dt;
           } else {
+            ghost.x = targetGateX;
+            ghost.y = targetGateY;
+            ghost.col = 13;
+            ghost.row = 11;
+            ghost.dir = DIRS.left;
             ghost.state = (state.frightenedTimer > 0) ? "frightened" : state.globalMode;
           }
           ghost.obj.pos = k.vec2(ghost.x, ghost.y);
@@ -691,11 +699,22 @@ export function gameplayScene(k) {
         ghost.x += ghost.dir.x * speed * dt;
         ghost.y += ghost.dir.y * speed * dt;
 
-        // Warp tunnel untuk hantu
+        // Warp tunnel horizontal (row 14)
         const tunnelMinX = OFFSET_X - CELL_SIZE;
         const tunnelMaxX = OFFSET_X + COLS * CELL_SIZE;
         if (ghost.x < tunnelMinX) ghost.x = tunnelMaxX - 2;
         if (ghost.x > tunnelMaxX) ghost.x = tunnelMinX + 2;
+
+        // Guard: jika keluar batas vertikal, kembalikan ke rumah hantu
+        const mazeMinY = OFFSET_Y;
+        const mazeMaxY = OFFSET_Y + ROWS * CELL_SIZE;
+        if (ghost.y < mazeMinY - CELL_SIZE || ghost.y > mazeMaxY + CELL_SIZE) {
+          ghost.x = OFFSET_X + 13 * CELL_SIZE + CELL_SIZE / 2;
+          ghost.y = OFFSET_Y + 14 * CELL_SIZE + CELL_SIZE / 2;
+          ghost.col = 13; ghost.row = 14;
+          ghost.state = "house";
+          ghost.dir = DIRS.up;
+        }
 
         ghost.obj.pos = k.vec2(ghost.x, ghost.y);
 
@@ -766,10 +785,25 @@ export function gameplayScene(k) {
       ghosts.forEach(g => {
         g.x = OFFSET_X + g.config.spawnOffset.col * CELL_SIZE + CELL_SIZE / 2;
         g.y = OFFSET_Y + g.config.spawnOffset.row * CELL_SIZE + CELL_SIZE / 2;
+        g.col = Math.floor(g.config.spawnOffset.col);
+        g.row = Math.floor(g.config.spawnOffset.row);
         g.dir = DIRS.up;
         g.state = g.config.startState;
+        g.target = { col: 13, row: 11, x: 13, y: 11 };
+        g.houseBounceY = 0;
         g.obj.pos = k.vec2(g.x, g.y);
       });
+
+      // Readytimer kecil setelah respawn
+      state.readyTimer = 1.5;
+      const respawnLabel = k.add([
+        k.text("READY!", { size: 24, font: "monospace" }),
+        k.pos(400, 300),
+        k.anchor("center"),
+        k.color(250, 204, 21),
+        k.z(100)
+      ]);
+      k.wait(1.5, () => k.destroy(respawnLabel));
     }
 
     // ==========================================

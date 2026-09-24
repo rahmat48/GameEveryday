@@ -379,19 +379,29 @@ export function getGhostTargetTile(ghost, pacman, blinky, globalMode) {
 
 /**
  * Compatibility function for gameplay scenes: returns direction vector { x, y, angle }.
+ * ghost must have .col and .row as tile coords (not pixels).
  */
 export function getNextGhostDirection(ghost, targetTile, map, isFrightened) {
   const mode = isFrightened ? 'frightened' : (ghost.state || 'chase');
-  const target = targetTile ? { x: targetTile.col ?? targetTile.x, y: targetTile.row ?? targetTile.y } : null;
+  // Use tile coords (.col/.row), never pixel .x/.y
+  const gTileX = ghost.col ?? 13;
+  const gTileY = ghost.row ?? 11;
+
+  const target = targetTile
+    ? { x: targetTile.col ?? targetTile.x ?? 13, y: targetTile.row ?? targetTile.y ?? 11 }
+    : null;
+
+  const scatterCorner = ghost.config?.scatterCorner || ghost.scatterCorner || null;
 
   const move = getNextGhostMove(
     {
-      x: ghost.col ?? ghost.x,
-      y: ghost.row ?? ghost.y,
+      x: gTileX,
+      y: gTileY,
       dir: ghost.dir,
       mode,
       name: ghost.config?.name || ghost.name,
-      scatterTarget: target
+      // scatterTarget only used in scatter mode — pass corner, not chase target
+      scatterTarget: mode === 'scatter' ? scatterCorner : target
     },
     target ? { x: target.x, y: target.y, dir: 'left' } : null,
     null,
