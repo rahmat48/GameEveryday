@@ -41,6 +41,8 @@ Setiap pengguna bertindak sebagai **Komandan Luar Angkasa** yang memiliki profil
    - Game duel matematika retro dengan 10 Stage, pertarungan monster boss, combo multiplier, dan efek partikel *critical hit*.
 2. **Snake Arcade (Data Worm Protocol)**:
    - Game arkade klasik kontrol cacing data luar angkasa dengan sistem power-up (Slow-Mo & Ghost Mode), akselerasi dinamis, dan multi-kontroler (WASD / Arrow Keys / Virtual D-Pad / Touch Swipe).
+3. **Orbit Defender (360° Turret Defense Protocol)**:
+   - Game shooter arkade retro pertahanan stasiun orbit antariksa dengan rotasi turret 360°, 3 tipe ancaman musuh (Drone, Asteroid, Bomber), wave progression dinamis, dan senjata super EMP pulsa kejut.
 
 ---
 

@@ -1,18 +1,14 @@
 /**
  * game.js
- * Inisialisasi game engine Kaplay dan integrasi seluruh scene Snake Arcade (Data Worm).
+ * Inisialisasi engine Kaplay dan integrasi seluruh scene Orbit Defender.
  */
 
 import kaplay from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
 import { menuScene } from "./scenes/menu.js";
 import { howToPlayScene } from "./scenes/howToPlay.js";
-import { gameplayScene } from "./scenes/gameplay.js?v=9";
+import { gameplayScene } from "./scenes/gameplay.js";
 import { gameOverScene } from "./scenes/gameOver.js";
 import { initAudio } from "./audio.js";
-import { initMobileController, toggleVirtualDpad } from "./mobileController.js";
-
-// Pasang toggle ke window global
-window.toggleVirtualDpad = toggleVirtualDpad;
 
 const k = kaplay({
   width: 800,
@@ -37,16 +33,15 @@ gameOverScene(k);
 // Scene Preload
 k.scene("preload", () => {
   k.add([
-    k.text("LOADING DATA WORM PROTOCOL...", { size: 18, font: "monospace" }),
+    k.text("LOADING ORBIT DEFENDER PROTOCOL...", { size: 18, font: "monospace" }),
     k.pos(400, 300),
     k.anchor("center"),
     k.color(34, 197, 94)
   ]);
 
   initAudio(k);
-  initMobileController();
 
-  k.wait(1.2, () => {
+  k.wait(0.8, () => {
     k.go("menu");
   });
 });

@@ -94,6 +94,8 @@ async function openLeaderboard(gameId, gameTitle) {
                 score = (u.battleMTK && u.battleMTK.highScore) || 0;
             } else if (gameId === 'snake-arcade') {
                 score = (u.snakeArcade && u.snakeArcade.highScore) || 0;
+            } else if (gameId === 'orbit-defender') {
+                score = (u.orbitDefender && u.orbitDefender.highScore) || 0;
             } else {
                 score = u.highScore || 0;
             }
@@ -845,6 +847,11 @@ function initPreviewAnimation() {
             mode: "snake-arcade",
             label: "● MISSION 2: SNAKE ARCADE (DATA WORM)",
             badgeCol: "#22c55e"
+        },
+        {
+            mode: "orbit-defender",
+            label: "● MISSION 3: ORBIT DEFENDER (360° TURRET)",
+            badgeCol: "#00d4ff"
         }
     ];
 
@@ -970,7 +977,7 @@ function initPreviewAnimation() {
                     pCtx.fillText('CRIT HIT!', bossX, bossY - 24);
                 }
             }
-        } else {
+        } else if (curGame.mode === "snake-arcade") {
             // SHOWCASE SNAKE ARCADE (DATA WORM)
             const t = Date.now() / 200;
             pCtx.textAlign = 'center';
@@ -1010,6 +1017,97 @@ function initPreviewAnimation() {
             pCtx.fillStyle = '#38bdf8';
             pCtx.font = '13px monospace';
             pCtx.fillText('ACCELERATING SPEED + POWER-UPS', pCanvas.width / 2, 200);
+        } else if (curGame.mode === "orbit-defender") {
+            // SHOWCASE ORBIT DEFENDER (360° TURRET DEFENSE)
+            const cx = pCanvas.width / 2;
+            const cy = 120;
+            const t = Date.now() / 1000;
+
+            // Radar Ring Visuals
+            pCtx.strokeStyle = 'rgba(0, 212, 255, 0.2)';
+            pCtx.lineWidth = 1;
+            [35, 65, 95].forEach(r => {
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, r, 0, Math.PI * 2);
+                pCtx.stroke();
+            });
+
+            // Sweeping Beam
+            const sweepAng = t * 2.2;
+            pCtx.strokeStyle = 'rgba(0, 212, 255, 0.4)';
+            pCtx.beginPath();
+            pCtx.moveTo(cx, cy);
+            pCtx.lineTo(cx + Math.cos(sweepAng) * 95, cy + Math.sin(sweepAng) * 95);
+            pCtx.stroke();
+
+            // Inti Pangkalan Luar Angkasa
+            pCtx.fillStyle = '#0f172a';
+            pCtx.strokeStyle = '#22c55e';
+            pCtx.lineWidth = 2;
+            pCtx.beginPath();
+            pCtx.arc(cx, cy, 18, 0, Math.PI * 2);
+            pCtx.fill();
+            pCtx.stroke();
+
+            // Turret Rotasi Mengarah ke Musuh Terdekat
+            const targetAngle = t * 1.8;
+            const barrelLen = 22;
+            pCtx.strokeStyle = '#00d4ff';
+            pCtx.lineWidth = 4;
+            pCtx.beginPath();
+            pCtx.moveTo(cx, cy);
+            pCtx.lineTo(cx + Math.cos(targetAngle) * barrelLen, cy + Math.sin(targetAngle) * barrelLen);
+            pCtx.stroke();
+
+            // Dome Center
+            pCtx.fillStyle = '#00d4ff';
+            pCtx.beginPath();
+            pCtx.arc(cx, cy, 5, 0, Math.PI * 2);
+            pCtx.fill();
+
+            // Tembakan Laser (Triple Shot Simulation)
+            const laserProg = (Date.now() % 600) / 600;
+            [-0.18, 0, 0.18].forEach(spread => {
+                const ang = targetAngle + spread;
+                const lx = cx + Math.cos(ang) * (barrelLen + laserProg * 85);
+                const ly = cy + Math.sin(ang) * (barrelLen + laserProg * 85);
+                pCtx.fillStyle = '#00d4ff';
+                pCtx.fillRect(lx - 3, ly - 3, 6, 6);
+            });
+
+            // Drone Musuh Mendekat dari Segala Penjuru
+            const enemyAngles = [targetAngle + 0.1, targetAngle + 2.1, targetAngle - 1.8];
+            enemyAngles.forEach((ea, idx) => {
+                const dist = 75 - Math.sin(t * 2 + idx) * 15;
+                const ex = cx + Math.cos(ea) * dist;
+                const ey = cy + Math.sin(ea) * dist;
+
+                pCtx.fillStyle = idx === 0 ? '#ef4444' : '#a855f7';
+                pCtx.fillRect(ex - 5, ey - 5, 10, 10);
+            });
+
+            // Ledakan Efek saat musuh tertembak
+            if (laserProg > 0.8 && particles.length < 20) {
+                const ex = cx + Math.cos(targetAngle) * 75;
+                const ey = cy + Math.sin(targetAngle) * 75;
+                for (let k = 0; k < 5; k++) {
+                    particles.push({
+                        x: ex,
+                        y: ey,
+                        vx: (Math.random() - 0.5) * 5,
+                        vy: (Math.random() - 0.5) * 5,
+                        size: Math.random() * 3 + 1,
+                        col: Math.random() < 0.5 ? '#00d4ff' : '#ef4444',
+                        life: 0.8
+                    });
+                }
+            }
+
+            // Info Teks Bawah
+            pCtx.fillStyle = '#00d4ff';
+            pCtx.font = '13px monospace';
+            pCtx.textAlign = 'center';
+            pCtx.fillText('360° DEFENSE • TRIPLE CANNON • EMP BOMB', pCanvas.width / 2, 204);
         }
 
         pCtx.textAlign = 'left';
@@ -1058,6 +1156,62 @@ function initCardPreviewAnim(canvasId, title) {
             ctx.fillStyle = '#22c55e';
             ctx.font = '10px monospace';
             ctx.fillText('WORM PROTOCOL LIVE', 12, 20);
+
+            requestAnimationFrame(render);
+            return;
+        }
+
+        // Variasi preview jika kartu adalah Orbit Defender
+        if (title && title.toLowerCase().includes('orbit')) {
+            const t = Date.now() / 400;
+            const cx = c.width / 2;
+            const cy = c.height / 2 + 5;
+
+            // Orbit ring
+            ctx.strokeStyle = 'rgba(34, 197, 94, 0.25)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Core center
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#22c55e';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Turret rotating
+            const angle = t % (Math.PI * 2);
+            const bx = cx + Math.cos(angle) * 18;
+            const by = cy + Math.sin(angle) * 18;
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(bx, by);
+            ctx.stroke();
+
+            // Laser pulse
+            const pulseDist = 20 + ((Date.now() % 600) / 600) * 45;
+            const lx = cx + Math.cos(angle) * pulseDist;
+            const ly = cy + Math.sin(angle) * pulseDist;
+            ctx.fillStyle = '#00ffff';
+            ctx.beginPath();
+            ctx.arc(lx, ly, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Incoming target drone
+            const enemyDist = 55 - ((Date.now() % 1200) / 1200) * 35;
+            const ex = cx + Math.cos(angle + 0.3) * enemyDist;
+            const ey = cy + Math.sin(angle + 0.3) * enemyDist;
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(ex - 4, ey - 4, 8, 8);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '10px monospace';
+            ctx.fillText('360° TURRET LIVE', 12, 20);
 
             requestAnimationFrame(render);
             return;

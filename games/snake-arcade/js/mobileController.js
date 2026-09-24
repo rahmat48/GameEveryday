@@ -9,15 +9,25 @@ export function setDirectionHandler(handler) {
   activeDirectionHandler = handler;
 }
 
+export function updateDpadStats(score, length, speed) {
+  const sEl = document.getElementById("side-stat-score");
+  const lEl = document.getElementById("side-stat-length");
+  const spEl = document.getElementById("side-stat-speed");
+  if (sEl) sEl.textContent = score;
+  if (lEl) lEl.textContent = length;
+  if (spEl) spEl.textContent = typeof speed === "number" ? speed.toFixed(1) : speed;
+}
+
 export function initMobileController(onDirectionChange) {
   const container = document.getElementById("mobile-controller");
+  const statsPanel = document.getElementById("side-stats-panel");
   if (!container) return { show: () => {}, hide: () => {} };
 
   if (onDirectionChange) {
     activeDirectionHandler = onDirectionChange;
   }
 
-  // Render 3x3 grid layout jika belum ada tombol
+  // Render 3x3 dpad layout
   if (!container.querySelector(".dpad-btn")) {
     container.innerHTML = `
       <div class="dpad-empty"></div>
@@ -65,9 +75,12 @@ export function initMobileController(onDirectionChange) {
   // Deteksi otomatis jika perangkat sentuh (touchscreen)
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 768;
   const userPref = localStorage.getItem("snakeArcade_show_dpad");
+  const panelWrapper = document.getElementById("side-control-panel");
   
   if (userPref === "true" || (userPref === null && isTouchDevice)) {
     container.classList.add("force-show");
+    if (statsPanel) statsPanel.classList.add("force-show");
+    if (panelWrapper) panelWrapper.classList.add("force-show");
   }
 
   if (hudBtn) {
@@ -75,20 +88,36 @@ export function initMobileController(onDirectionChange) {
   }
 
   return {
-    show: () => { container.classList.add("force-show"); },
-    hide: () => { container.classList.remove("force-show"); }
+    show: () => { 
+      container.classList.add("force-show"); 
+      if (statsPanel) statsPanel.classList.add("force-show");
+      if (panelWrapper) panelWrapper.classList.add("force-show");
+    },
+    hide: () => { 
+      container.classList.remove("force-show"); 
+      if (statsPanel) statsPanel.classList.remove("force-show");
+      if (panelWrapper) panelWrapper.classList.remove("force-show");
+    }
   };
 }
 
 // Toggle manual dari tombol HUD
 export function toggleVirtualDpad() {
   const container = document.getElementById("mobile-controller");
+  const statsPanel = document.getElementById("side-stats-panel");
+  const panelWrapper = document.getElementById("side-control-panel");
   if (!container) return;
   
   // Pastikan tombol ter-render
   initMobileController(activeDirectionHandler);
 
   const isShown = container.classList.toggle("force-show");
+  if (statsPanel) {
+    statsPanel.classList.toggle("force-show", isShown);
+  }
+  if (panelWrapper) {
+    panelWrapper.classList.toggle("force-show", isShown);
+  }
   localStorage.setItem("snakeArcade_show_dpad", String(isShown));
 
   const btn = document.getElementById("btn-toggle-dpad");

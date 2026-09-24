@@ -1,0 +1,212 @@
+:root {
+  --green: #22c55e;
+  --purple: #a855f7;
+  --cyan: #00d4ff;
+  --bg: #0a0a1a;
+  --bg-panel: rgba(10, 10, 26, 0.85);
+  --text: #e0e0ff;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+/* Theme Variasi */
+body.theme-purple {
+  --green: #d946ef;
+  --cyan: #a855f7;
+}
+
+body.theme-light {
+  --bg: #f0f4f8;
+  --bg-panel: rgba(240, 244, 248, 0.95);
+  --text: #0f172a;
+  --green: #0284c7;
+  --cyan: #0284c7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* CRT Scanline Overlay */
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 4px,
+    rgba(0, 0, 0, 0.15) 4px,
+    rgba(0, 0, 0, 0.15) 6px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+#hud-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--green);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  z-index: 10;
+}
+
+#commander-info {
+  color: var(--text);
+  text-shadow: 0 0 6px var(--green);
+}
+
+.hud-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#btn-mute, #btn-back {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#btn-mute {
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+}
+
+#btn-mute:hover {
+  background: var(--cyan);
+  color: #000;
+}
+
+#btn-back {
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+#btn-back:hover {
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
+}
+
+#game-container {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  z-index: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0a0a1a;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+  border: 2px solid var(--green);
+  border-radius: 6px;
+}
+
+#game-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  display: block;
+}
+
+/* Mobile Touch Fire Button Overlay (bawah kanan) */
+#mobile-fire-btn {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.35);
+  border: 3px solid #ef4444;
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  z-index: 200;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+#mobile-fire-btn:active {
+  background: rgba(239, 68, 68, 0.8);
+  transform: scale(0.92);
+}
+
+/* Mobile EMP Bomb Button Overlay (bawah kiri) */
+#mobile-bomb-btn {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.35);
+  border: 3px solid #f59e0b;
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  z-index: 200;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+#mobile-bomb-btn:active {
+  background: rgba(245, 158, 11, 0.8);
+  transform: scale(0.92);
+}
+
+@media (max-width: 850px) {
+  #game-container {
+    max-width: 96vw;
+    border-width: 1px;
+  }
+  #mobile-fire-btn, #mobile-bomb-btn {
+    display: flex;
+  }
+}

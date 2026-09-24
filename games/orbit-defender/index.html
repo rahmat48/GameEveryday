@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#22c55e">
-  <title>Snake Arcade - Space Game Hub</title>
+  <title>Orbit Defender - Space Game Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=5">
+  <link rel="stylesheet" href="./css/style.css?v=1">
 
   <!-- Sentry Error Tracking -->
   <script src="https://browser.sentry-cdn.com/7.114.0/bundle.min.js" crossorigin="anonymous"></script>
@@ -19,32 +19,26 @@
         dsn: window.SENTRY_DSN || "",
         environment: isProduction ? 'production' : 'development'
       });
-      Sentry.setTag('game', 'snake-arcade');
+      Sentry.setTag('game', 'orbit-defender');
     }
   </script>
 </head>
 <body>
   <div id="hud-top">
     <div id="commander-info">🚀 Commander</div>
-    <div style="display: flex; gap: 8px; align-items: center;">
-      <button id="btn-toggle-dpad" title="Tampilkan/Sembunyikan Keypad Virtual" style="display: none; font-family: 'Press Start 2P', monospace; font-size: 10px; padding: 8px 12px; background: transparent; color: var(--green); border: 1px solid var(--green); border-radius: 4px; cursor: pointer;">🎮 KEYPAD</button>
+    <div class="hud-actions">
+      <button id="btn-mute" title="Matikan / Hidupkan Suara">🔊 SUARA</button>
       <button id="btn-back" onclick="window.location.href='../../dashboard.html'">BACK</button>
     </div>
   </div>
 
   <div id="game-container">
-    <!-- Panel Samping: Wadah Skor & Keypad (Berada di sisi kanan terpusat secara vertikal) -->
-    <div id="side-control-panel">
-      <!-- Panel Skor Terpisah di Atas Keypad -->
-      <div id="side-stats-panel">
-        <div class="side-stat-item"><span class="side-stat-lbl">SKOR</span><span class="side-stat-val val-score" id="side-stat-score">0</span></div>
-        <div class="side-stat-item"><span class="side-stat-lbl">PANJANG</span><span class="side-stat-val val-len" id="side-stat-length">3</span></div>
-        <div class="side-stat-item"><span class="side-stat-lbl">SPEED</span><span class="side-stat-val val-spd" id="side-stat-speed">5.0</span></div>
-      </div>
-      <!-- On-Screen D-Pad (Keypad di tengah panel samping) -->
-      <div id="mobile-controller"></div>
-    </div>
+    <!-- Canvas Kaplay akan ter-mount di sini -->
   </div>
+
+  <!-- Mobile Overlay Control Buttons (Otomatis tampil di layar sentuh / mobile) -->
+  <button id="mobile-bomb-btn" title="Luncurkan Bom EMP">BOM</button>
+  <button id="mobile-fire-btn" title="Tembak Laser">TEMBAK</button>
 
   <script>
     const savedTheme = localStorage.getItem('hub_selected_theme') || 'green';
@@ -57,6 +51,20 @@
       infoEl.textContent = `${commanderAvatar} ${commanderName}`;
     }
   </script>
-  <script type="module" src="./js/game.js?v=5"></script>
+  <script type="module">
+    import { toggleMute, isMuted } from "./js/audio.js";
+    const muteBtn = document.getElementById("btn-mute");
+    if (muteBtn) {
+      const updateLabel = () => {
+        muteBtn.textContent = isMuted() ? "🔇 MUTE" : "🔊 SUARA";
+      };
+      updateLabel();
+      muteBtn.onclick = () => {
+        toggleMute();
+        updateLabel();
+      };
+    }
+  </script>
+  <script type="module" src="./js/game.js?v=1"></script>
 </body>
 </html>

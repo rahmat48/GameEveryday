@@ -95,6 +95,7 @@ body::after {
   max-width: 800px;
   aspect-ratio: 4 / 3;
   z-index: 1;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -110,43 +111,94 @@ body::after {
   border: 2px solid var(--green);
 }
 
-/* Mobile D-Pad Controller */
-#mobile-controller {
-  display: none;
+/* Panel Kontrol Samping (Wadah Stats & Keypad Terpusat Vertikal) */
+#side-control-panel {
+  display: none !important;
 }
 
-#mobile-controller.force-show {
+body.in-gameplay #side-control-panel.force-show {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  position: absolute;
+  top: 50%;
+  right: 42px;
+  transform: translateY(-50%);
+  z-index: 99;
+}
+
+/* Panel Skor Terpisah di Atas Keypad */
+#side-stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 156px;
+  padding: 10px 14px;
+  background: rgba(10, 10, 26, 0.85);
+  border: 1.5px solid rgba(34, 197, 94, 0.5);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.7);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  box-sizing: border-box;
+}
+
+.side-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.side-stat-lbl {
+  color: #94a3b8;
+  font-size: 9px;
+}
+
+.val-score {
+  color: var(--green);
+}
+
+.val-len {
+  color: #38bdf8;
+}
+
+.val-spd {
+  color: #f59e0b;
+}
+
+/* Mobile D-Pad Controller (Keypad Terpusat di Bawah Panel Skor) */
+#mobile-controller {
   display: grid !important;
   grid-template-columns: repeat(3, 44px);
   grid-template-rows: repeat(3, 44px);
   gap: 5px;
-  padding: 6px;
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  left: auto;
-  transform: none;
-  z-index: 999;
+  width: 156px;
+  padding: 8px;
+  background: rgba(10, 10, 26, 0.85);
+  border: 1.5px solid rgba(34, 197, 94, 0.5);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
   justify-content: center;
   align-items: center;
-  background: rgba(10, 10, 26, 0.45);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 12px;
-  backdrop-filter: blur(2px);
-  opacity: 0.5;
+  opacity: 0.88;
   transition: opacity 0.2s, background 0.2s;
 }
 
-#mobile-controller.force-show:hover,
-#mobile-controller.force-show:active {
-  opacity: 0.9;
-  background: rgba(10, 10, 26, 0.75);
+#mobile-controller:hover,
+#mobile-controller:active {
+  opacity: 1;
+  background: rgba(10, 10, 26, 0.95);
 }
 
 .dpad-btn {
   width: 44px;
   height: 44px;
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(34, 197, 94, 0.2);
   border: 1.5px solid rgba(34, 197, 94, 0.7);
   border-radius: 8px;
   color: var(--green);
@@ -189,35 +241,48 @@ body::after {
     max-height: 48vh;
   }
 
-  #mobile-controller,
-  #mobile-controller.force-show {
-    display: grid !important;
-    grid-template-columns: repeat(3, 52px);
-    grid-template-rows: repeat(3, 52px);
-    gap: 6px;
-    padding: 8px;
-    position: fixed;
-    bottom: 12px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
-    background: rgba(10, 10, 26, 0.55);
-    border: 1.5px solid rgba(34, 197, 94, 0.4);
-    border-radius: 14px;
-    backdrop-filter: blur(3px);
-    opacity: 0.65;
+  #side-control-panel.force-show {
+    top: 50%;
+    right: 12px;
+    gap: 8px;
   }
 
-  #mobile-controller:active,
-  #mobile-controller.force-show:active {
-    opacity: 0.95;
+  body.in-gameplay #side-control-panel.force-show {
+    display: flex !important;
+  }
+
+  #side-stats-panel {
+    width: 120px;
+    padding: 6px 8px;
+    gap: 4px;
+    font-size: 8px;
+    border-radius: 8px;
+  }
+
+  .side-stat-lbl {
+    font-size: 7px;
+  }
+
+  #mobile-controller {
+    grid-template-columns: repeat(3, 34px);
+    grid-template-rows: repeat(3, 34px);
+    gap: 3px;
+    width: 120px;
+    padding: 6px;
+    border-radius: 10px;
   }
 
   .dpad-btn {
-    width: 52px;
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .dpad-empty {
+    width: 34px;
+    height: 34px;
+  }
+}
     height: 52px;
     font-size: 16px;
   }

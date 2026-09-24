@@ -49,6 +49,17 @@
           "bestDuration": {
             ".validate": "newData.isNumber() && newData.val() >= 0"
           }
+        },
+        "orbitDefender": {
+          "highScore": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
+          },
+          "bestWave": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "bestDuration": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          }
         }
       }
     }

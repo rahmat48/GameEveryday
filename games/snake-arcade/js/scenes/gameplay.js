@@ -5,7 +5,7 @@
 
 import { initInput } from "../input.js";
 import { initSwipe } from "../swipe.js";
-import { initMobileController } from "../mobileController.js";
+import { initMobileController, updateDpadStats } from "../mobileController.js";
 import { getCurrentUser, saveSnakeScore, updateGameStats } from "../user.js";
 import { retroPanel, screenShake, floatingText } from "../ui.js";
 import { playSfx, playBgm, stopBgm } from "../audio.js";
@@ -13,8 +13,8 @@ import { playSfx, playBgm, stopBgm } from "../audio.js";
 export function gameplayScene(k) {
   k.scene("gameplay", async () => {
     // Dimensi Grid & Play Area
-    const GRID_SIZE = 20; // 20x20 sel
-    const CELL_SIZE = 24; // 24px per sel = 480x480
+    const GRID_SIZE = 30; // 30x30 sel (lebih banyak kotak)
+    const CELL_SIZE = 16; // 16px per sel = 480x480 (ukuran window tetap)
     const OFFSET_X = 160; // Posisi X awal grid di layar 800x600
     const OFFSET_Y = 80;  // Posisi Y awal grid
     const INITIAL_SPEED = 5;
@@ -26,9 +26,9 @@ export function gameplayScene(k) {
     // State Gameplay
     const state = {
       snake: [
-        { x: 10, y: 10 },
-        { x: 9, y: 10 },
-        { x: 8, y: 10 }
+        { x: 15, y: 15 },
+        { x: 14, y: 15 },
+        { x: 13, y: 15 }
       ],
       direction: { x: 1, y: 0, name: "right" },
       nextDirection: { x: 1, y: 0, name: "right" },
@@ -45,7 +45,12 @@ export function gameplayScene(k) {
       ghostTimer: 0
     };
 
-    playBgm(k, "bgm-gameplay");
+    // Tampilkan tombol toggle Keypad di HUD saat masuk gameplay
+    const keypadToggleBtn = document.getElementById("btn-toggle-dpad");
+    if (keypadToggleBtn) {
+      keypadToggleBtn.style.display = "inline-block";
+    }
+    document.body.classList.add("in-gameplay");
 
     // Starfield Background
     for (let i = 0; i < 30; i++) {
@@ -88,33 +93,74 @@ export function gameplayScene(k) {
     }
 
     // HUD Header Gameplay
+    const isDpadActive = () => {
+      const el = document.getElementById("mobile-controller");
+      return el && el.classList.contains("force-show");
+    };
+
+    // Animasi pergeseran posisi kamera ketika D-Pad aktif/nonaktif
+    let targetCamX = isDpadActive() ? 480 : 400;
+
     const scoreText = k.add([
       k.text("SKOR: 0", { size: 18, font: "monospace" }),
-      k.pos(OFFSET_X, 45),
+      k.anchor("center"),
+      k.pos(252, 45),
       k.color(34, 197, 94),
       k.z(50)
     ]);
 
     const lengthText = k.add([
       k.text("PANJANG: 3", { size: 18, font: "monospace" }),
-      k.pos(OFFSET_X + 140, 45),
+      k.anchor("center"),
+      k.pos(400, 45),
       k.color(56, 189, 248),
       k.z(50)
     ]);
 
     const speedText = k.add([
       k.text("SPEED: 5.0", { size: 18, font: "monospace" }),
-      k.pos(OFFSET_X + 280, 45),
+      k.anchor("center"),
+      k.pos(532, 45),
       k.color(245, 158, 11),
       k.z(50)
     ]);
 
     const powerupBadge = k.add([
       k.text("", { size: 16, font: "monospace" }),
-      k.pos(OFFSET_X + 390, 45),
+      k.anchor("left"),
+      k.pos(610, 45),
       k.color(217, 70, 239),
       k.z(50)
     ]);
+
+    // Listener otomatis: jika D-Pad aktif, skor dipindahkan ke samping (atas keypad)
+    // dan teks di atas canvas disembunyikan agar bersih. Jika D-Pad nonaktif, kembali default.
+    k.onUpdate(() => {
+      const active = isDpadActive();
+      targetCamX = active ? 480 : 400;
+      const currentCam = k.getCamPos ? k.getCamPos() : k.camPos();
+      
+      // Interpolasi pergeseran kamera
+      const nextX = k.lerp(currentCam.x, targetCamX, 0.15);
+      if (k.setCamPos) {
+        k.setCamPos(k.vec2(nextX, 300));
+      } else {
+        k.camPos(k.vec2(nextX, 300));
+      }
+
+      // Jika D-Pad aktif -> sembunyikan teks HUD atas (pindah ke panel samping)
+      scoreText.hidden = active;
+      lengthText.hidden = active;
+      speedText.hidden = active;
+
+      // Pindahkan badge powerup ke kiri atas grid ular saat keypad aktif
+      if (active) {
+        powerupBadge.pos = k.vec2(OFFSET_X, 45);
+        updateDpadStats(state.score, state.length, state.speed);
+      } else {
+        powerupBadge.pos = k.vec2(OFFSET_X + 440, 45);
+      }
+    });
 
     // Kontainer Render Ular & Makanan
     let snakeSegments = [];
@@ -137,7 +183,7 @@ export function gameplayScene(k) {
         const opacity = state.ghostTimer > 0 ? 0.6 : (isHead ? 1 : 0.85);
 
         const s = k.add([
-          k.rect(CELL_SIZE - 2, CELL_SIZE - 2, { radius: isHead ? 4 : 2 }),
+          k.rect(CELL_SIZE - 2, CELL_SIZE - 2, { radius: isHead ? 3 : 2 }),
           k.pos(toPixelPos(seg.x, seg.y)),
           k.anchor("center"),
           k.color(color),
@@ -147,7 +193,7 @@ export function gameplayScene(k) {
 
         if (isHead) {
           s.add([
-            k.rect(4, 4),
+            k.rect(3, 3),
             k.pos(0, 0),
             k.anchor("center"),
             k.color(15, 23, 42)
@@ -178,11 +224,11 @@ export function gameplayScene(k) {
       state.food = validPos;
 
       foodObj = k.add([
-        k.rect(CELL_SIZE - 4, CELL_SIZE - 4, { radius: 3 }),
+        k.rect(CELL_SIZE - 2, CELL_SIZE - 2, { radius: 2 }),
         k.pos(toPixelPos(validPos.x, validPos.y)),
         k.anchor("center"),
         k.color(168, 85, 247),
-        k.outline(2, k.rgb(217, 70, 239)),
+        k.outline(1, k.rgb(217, 70, 239)),
         k.z(8)
       ]);
     }
@@ -209,11 +255,11 @@ export function gameplayScene(k) {
 
       const col = type === "slowmo" ? k.rgb(56, 189, 248) : k.rgb(250, 204, 21);
       powerupObj = k.add([
-        k.rect(CELL_SIZE - 4, CELL_SIZE - 4, { radius: 6 }),
+        k.rect(CELL_SIZE - 2, CELL_SIZE - 2, { radius: 3 }),
         k.pos(toPixelPos(validPos.x, validPos.y)),
         k.anchor("center"),
         k.color(col),
-        k.outline(2, k.rgb(255, 255, 255)),
+        k.outline(1, k.rgb(255, 255, 255)),
         k.z(9)
       ]);
     }
@@ -239,24 +285,44 @@ export function gameplayScene(k) {
     const mobileCtrl = initMobileController(changeDirection);
 
     // Pause Modal Logic
-    let pausePanel = null;
+    let isPauseActive = false;
     function togglePause() {
       if (state.isGameOver) return;
       state.isPaused = !state.isPaused;
       if (state.isPaused) {
-        pausePanel = retroPanel(k, k.vec2(400, 300), 320, 180);
-        pausePanel.add([
+        isPauseActive = true;
+        k.add([
+          k.rect(800, 600),
+          k.pos(0, 0),
+          k.color(0, 0, 0),
+          k.opacity(0.5),
+          k.area(),
+          k.z(100),
+          "pauseModal"
+        ]);
+        const p = k.add([
+          k.rect(320, 180, { radius: 8 }),
+          k.pos(400, 300),
+          k.anchor("center"),
+          k.color(10, 10, 26),
+          k.outline(2, k.rgb(34, 197, 94)),
+          k.z(101),
+          "pauseModal"
+        ]);
+        p.add([
           k.text("GAME DIPAUSET", { size: 22, font: "monospace" }),
           k.pos(0, -35),
           k.anchor("center"),
           k.color(245, 158, 11)
         ]);
-        const resBtn = pausePanel.add([
+        const resBtn = k.add([
           k.rect(160, 40, { radius: 4 }),
-          k.pos(0, 35),
+          k.pos(400, 335),
           k.anchor("center"),
           k.color(34, 197, 94),
-          k.area()
+          k.area(),
+          k.z(102),
+          "pauseModal"
         ]);
         resBtn.add([
           k.text("LANJUT", { size: 18, font: "monospace" }),
@@ -264,9 +330,9 @@ export function gameplayScene(k) {
           k.color(10, 10, 26)
         ]);
         resBtn.onClick(() => togglePause());
-      } else if (pausePanel) {
-        pausePanel.destroy();
-        pausePanel = null;
+      } else {
+        isPauseActive = false;
+        k.destroyAll("pauseModal");
       }
     }
 
@@ -291,6 +357,17 @@ export function gameplayScene(k) {
       }
 
       k.wait(1.2, () => {
+        // Sembunyikan tombol toggle Keypad dan reset posisi kamera
+        if (keypadToggleBtn) {
+          keypadToggleBtn.style.display = "none";
+        }
+        document.body.classList.remove("in-gameplay");
+        if (k.setCamPos) {
+          k.setCamPos(k.vec2(400, 300));
+        } else {
+          k.camPos(k.vec2(400, 300));
+        }
+
         swipeCtrl.destroy();
         k.go("gameOver", {
           score: state.score,

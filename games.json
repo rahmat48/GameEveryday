@@ -16,5 +16,14 @@
     "releaseDate": "2026-09-24",
     "path": "games/snake-arcade/index.html",
     "thumbnail": "games/snake-arcade/assets/img/thumb.png"
+  },
+  {
+    "id": "orbit-defender",
+    "title": "Orbit Defender",
+    "description": "Pertahankan inti stasiun antariksa 360° dari drone, asteroid, dan heavy bomber dengan turret dan bom EMP!",
+    "genre": "Shooter",
+    "releaseDate": "2026-09-25",
+    "path": "games/orbit-defender/index.html",
+    "thumbnail": "games/orbit-defender/assets/img/thumb.png"
   }
 ]

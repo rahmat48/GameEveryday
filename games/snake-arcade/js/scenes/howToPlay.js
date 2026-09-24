@@ -7,6 +7,9 @@ import { makeButton } from "../ui.js";
 
 export function howToPlayScene(k) {
   k.scene("howToPlay", () => {
+    document.body.classList.remove("in-gameplay");
+    const keypadToggleBtn = document.getElementById("btn-toggle-dpad");
+    if (keypadToggleBtn) keypadToggleBtn.style.display = "none";
     // Starfield Background
     for (let i = 0; i < 30; i++) {
       k.add([

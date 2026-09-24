@@ -8,6 +8,9 @@ import { getCurrentUser, loadSnakeProgress } from "../user.js";
 
 export function gameOverScene(k) {
   k.scene("gameOver", async (data = { score: 0, length: 3, duration: 0 }) => {
+    document.body.classList.remove("in-gameplay");
+    const keypadToggleBtn = document.getElementById("btn-toggle-dpad");
+    if (keypadToggleBtn) keypadToggleBtn.style.display = "none";
     // Starfield Background
     for (let i = 0; i < 30; i++) {
       k.add([
@@ -46,28 +49,28 @@ export function gameOverScene(k) {
     // Detail Hasil Permainan
     k.add([
       k.text(`SKOR AKHIR : ${data.score} PTS`, { size: 22, font: "monospace" }),
-      k.pos(400, 235),
+      k.pos(400, 210),
       k.anchor("center"),
       k.color(34, 197, 94)
     ]);
 
     k.add([
       k.text(`PANJANG WORM : ${data.length} BYTE`, { size: 18, font: "monospace" }),
-      k.pos(400, 275),
+      k.pos(400, 250),
       k.anchor("center"),
       k.color(56, 189, 248)
     ]);
 
     k.add([
       k.text(`DURASI SURVIVE : ${data.duration} DETIK`, { size: 18, font: "monospace" }),
-      k.pos(400, 315),
+      k.pos(400, 290),
       k.anchor("center"),
       k.color(224, 224, 255)
     ]);
 
     k.add([
       k.text(`REKOR TERTINGGI : ${progress.highScore} PTS`, { size: 18, font: "monospace" }),
-      k.pos(400, 355),
+      k.pos(400, 330),
       k.anchor("center"),
       k.color(245, 158, 11)
     ]);

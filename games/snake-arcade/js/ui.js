@@ -42,6 +42,7 @@ export function makeButton(k, text, pos, onClick, width = 220, height = 48) {
 
   btn.add([
     k.text(text, { size: 18, font: "monospace" }),
+    k.pos(0, 0),
     k.anchor("center"),
     k.color(theme.primary)
   ]);
