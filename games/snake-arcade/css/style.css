@@ -117,52 +117,60 @@ body::after {
 
 #mobile-controller.force-show {
   display: grid !important;
-  grid-template-columns: repeat(3, 60px);
-  grid-template-rows: repeat(3, 60px);
-  gap: 8px;
-  padding: 10px;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 5px;
+  padding: 6px;
   position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 16px;
+  right: 16px;
+  left: auto;
+  transform: none;
   z-index: 999;
   justify-content: center;
   align-items: center;
+  background: rgba(10, 10, 26, 0.45);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(2px);
+  opacity: 0.5;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+#mobile-controller.force-show:hover,
+#mobile-controller.force-show:active {
+  opacity: 0.9;
   background: rgba(10, 10, 26, 0.75);
-  border: 1px solid rgba(34, 197, 94, 0.4);
-  border-radius: 16px;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 }
 
 .dpad-btn {
-  width: 60px;
-  height: 60px;
-  background: rgba(34, 197, 94, 0.2);
-  border: 2px solid var(--green);
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1.5px solid rgba(34, 197, 94, 0.7);
+  border-radius: 8px;
   color: var(--green);
   font-family: 'Press Start 2P', monospace;
-  font-size: 20px;
+  font-size: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   user-select: none;
   touch-action: manipulation;
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.25);
   transition: transform 0.08s, background 0.08s;
 }
 
 .dpad-btn:active {
   transform: scale(0.9);
   background: rgba(34, 197, 94, 0.5);
-  box-shadow: 0 0 18px rgba(34, 197, 94, 0.9);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.9);
 }
 
 .dpad-empty {
-  width: 60px;
-  height: 60px;
+  width: 44px;
+  height: 44px;
   pointer-events: none;
 }
 
@@ -173,7 +181,7 @@ body::after {
 
   #game-container {
     max-height: 48vh;
-    margin-top: 56px;
+    margin-top: 52px;
     margin-bottom: 0;
   }
 
@@ -181,34 +189,42 @@ body::after {
     max-height: 48vh;
   }
 
-  #mobile-controller {
-    display: grid;
-    grid-template-columns: repeat(3, 56px);
-    grid-template-rows: repeat(3, 56px);
+  #mobile-controller,
+  #mobile-controller.force-show {
+    display: grid !important;
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(3, 52px);
     gap: 6px;
     padding: 8px;
     position: fixed;
-    bottom: 8px;
+    bottom: 12px;
     left: 50%;
+    right: auto;
     transform: translateX(-50%);
     z-index: 999;
     justify-content: center;
     align-items: center;
-    background: rgba(10, 10, 26, 0.9);
-    border: 2px solid rgba(34, 197, 94, 0.5);
+    background: rgba(10, 10, 26, 0.55);
+    border: 1.5px solid rgba(34, 197, 94, 0.4);
     border-radius: 14px;
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(3px);
+    opacity: 0.65;
+  }
+
+  #mobile-controller:active,
+  #mobile-controller.force-show:active {
+    opacity: 0.95;
   }
 
   .dpad-btn {
-    width: 56px;
-    height: 56px;
-    font-size: 18px;
+    width: 52px;
+    height: 52px;
+    font-size: 16px;
   }
 
   .dpad-empty {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
   }
 }
 
