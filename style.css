@@ -121,7 +121,7 @@ button:hover {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 30px;
     padding: 30px 20px 80px 20px;
     max-width: 1080px;
@@ -132,6 +132,7 @@ button:hover {
 
 .game-card {
     width: 320px;
+    height: 410px;
     max-width: 100%;
     border: 2px solid var(--border-color);
     background: var(--card-bg);
@@ -144,6 +145,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     box-sizing: border-box;
 }
 
@@ -158,6 +160,7 @@ button:hover {
     font-size: 1.1rem;
     margin: 15px 0 10px 0;
     color: var(--text-color);
+    min-height: 24px;
 }
 
 .game-card p {
@@ -166,6 +169,17 @@ button:hover {
     color: #cbd5e1;
     margin: 0 0 15px 0;
     flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 75px;
+}
+
+.game-card .card-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 .game-card small {

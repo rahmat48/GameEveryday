@@ -53,7 +53,7 @@ async function loadGames() {
             <canvas id="${canvasId}" width="280" height="130" style="width: 100%; height: 130px; background: #070714; border: 1px dashed var(--border-color); border-radius: 4px; display: block; margin-bottom: 12px; cursor: pointer;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')"></canvas>
             <h3 style="cursor: pointer;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')">${game.title}</h3>
             <p>${game.description}</p>
-            <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 10px;">
+            <div class="card-actions">
                 <button onclick="launchGame('${game.path}', '${game.id}', '${game.title}')" style="flex: 2; padding: 8px; font-size: 1rem;">${t('btnPlay')}</button>
                 <button onclick="openLeaderboard('${game.id}', '${game.title}')" style="flex: 1; padding: 8px; font-size: 0.95rem; border-color: #f59e0b; color: #f59e0b;">${t('btnScore')}</button>
             </div>
