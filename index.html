@@ -62,16 +62,16 @@
     
     <header>
         <h1>Space Game Hub</h1>
-        <p>Mainkan Game Bertema: <span id="typing-game-type" style="color: #00d4ff; border-bottom: 2px solid #00d4ff;"></span></p>
+        <p><span data-i18n="heroTagline">Mainkan Game Bertema:</span> <span id="typing-game-type" style="color: #00d4ff; border-bottom: 2px solid #00d4ff;"></span></p>
     </header>
 
     <!-- Hero / Animated Preview Section -->
     <div style="max-width: 600px; margin: 0 auto 30px auto; text-align: center; border: 2px solid var(--border-color); padding: 20px; background: rgba(10,10,26,0.7); box-shadow: 0 0 25px var(--glow-color); border-radius: 8px;">
         <canvas id="preview-anim-canvas" width="480" height="220" style="width: 100%; max-width: 480px; height: auto; border: 1px dashed var(--border-color); background: #000; border-radius: 4px; display: block; margin: 0 auto 15px auto;"></canvas>
-        <p style="font-size: 1.2rem; color: #e0e0ff; margin-bottom: 20px;">Masuk sebagai Komandan untuk mengakses misi dan catatan skor game harian.</p>
+        <p data-i18n="heroDesc" style="font-size: 1.2rem; color: #e0e0ff; margin-bottom: 20px;">Masuk sebagai Komandan untuk mengakses misi dan catatan skor game harian.</p>
         <div id="auth-buttons" style="display: flex; justify-content: center; gap: 15px;">
-            <button onclick="showAuthModal('login')" style="padding: 12px 30px; font-size: 1.3rem;">LOGIN</button>
-            <button onclick="showAuthModal('signup')" style="padding: 12px 30px; font-size: 1.3rem; border-color: #a855f7; color: #a855f7;">AYO DAFTAR SEKARANG</button>
+            <button data-i18n="btnLogin" onclick="showAuthModal('login')" style="padding: 12px 30px; font-size: 1.3rem;">LOGIN</button>
+            <button data-i18n="btnSignup" onclick="showAuthModal('signup')" style="padding: 12px 30px; font-size: 1.3rem; border-color: #a855f7; color: #a855f7;">AYO DAFTAR SEKARANG</button>
         </div>
     </div>
 
@@ -82,9 +82,9 @@
         <div id="auth-error-msg" style="display: none; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 1.05rem; padding: 10px; margin-bottom: 15px; border-radius: 4px; text-align: center; font-family: 'VT323', monospace;"></div>
 
         <div id="signup-extra" style="display: none;">
-            <input type="text" id="auth-name" placeholder="Nama Komandan" style="width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--input-text); font-family: 'VT323', monospace; font-size: 1.25rem; box-sizing: border-box; border-radius: 4px;">
+            <input type="text" id="auth-name" data-i18n-placeholder="commanderNamePlaceholder" placeholder="Nama Komandan" style="width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--input-text); font-family: 'VT323', monospace; font-size: 1.25rem; box-sizing: border-box; border-radius: 4px;">
             
-            <p style="margin: 5px 0; font-size: 0.95rem; color: var(--text-color);">Pilih Avatar:</p>
+            <p data-i18n="chooseAvatar" style="margin: 5px 0; font-size: 0.95rem; color: var(--text-color);">Pilih Avatar:</p>
             <div id="avatar-selector" style="display: flex; justify-content: space-around; margin-bottom: 15px;">
                 <span onclick="selectAvatar('🚀')" class="avatar-opt" style="cursor: pointer; font-size: 1.6rem; padding: 2px 6px; border: 1px solid var(--border-color); border-radius: 4px;">🚀</span>
                 <span onclick="selectAvatar('👾')" class="avatar-opt" style="cursor: pointer; font-size: 1.6rem; padding: 2px 6px; border: 1px solid transparent; border-radius: 4px;">👾</span>
@@ -93,22 +93,33 @@
             </div>
         </div>
 
-        <input type="email" id="auth-email" placeholder="Email Komandan" style="width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--input-text); font-family: 'VT323', monospace; font-size: 1.25rem; box-sizing: border-box; border-radius: 4px;">
-        <input type="password" id="auth-password" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 12px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--input-text); font-family: 'VT323', monospace; font-size: 1.25rem; box-sizing: border-box; border-radius: 4px;">
+        <input type="email" id="auth-email" data-i18n-placeholder="emailPlaceholder" placeholder="Email Komandan" style="width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--input-text); font-family: 'VT323', monospace; font-size: 1.25rem; box-sizing: border-box; border-radius: 4px;">
+        <input type="password" id="auth-password" data-i18n-placeholder="passwordPlaceholder" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 12px; background: var(--input-bg); border: 2px solid var(--border-color); color: var(--input-text); font-family: 'VT323', monospace; font-size: 1.25rem; box-sizing: border-box; border-radius: 4px;">
         
         <div id="forgot-password-link" style="text-align: right; margin-bottom: 15px;">
-            <a href="javascript:void(0)" onclick="handleForgotPassword()" style="color: var(--text-color); font-size: 1.1rem; text-decoration: none; border-bottom: 1px dashed var(--border-color); opacity: 0.85;">Lupa Password?</a>
+            <a href="javascript:void(0)" data-i18n="forgotPassword" onclick="handleForgotPassword()" style="color: var(--text-color); font-size: 1.1rem; text-decoration: none; border-bottom: 1px dashed var(--border-color); opacity: 0.85;">Lupa Password?</a>
         </div>
 
         <button id="auth-submit" onclick="handleAuth()" style="width: 100%; margin-bottom: 10px; font-size: 1.2rem;">SUBMIT</button>
-        <button onclick="closeAuthModal()" style="width: 100%; background: transparent; border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem;">BATAL</button>
+        <button data-i18n="btnCancel" onclick="closeAuthModal()" style="width: 100%; background: transparent; border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem;">BATAL</button>
     </div>
     <div id="modal-overlay" onclick="closeAuthModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;"></div>
 
-    <!-- Floating Controls (Mute & Theme) -->
+    <!-- Floating Controls (Mute, Language & Theme) -->
     <div id="floating-controls-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; align-items: center; gap: 12px;">
         <!-- Audio Mute Button -->
         <button id="audio-toggle-btn" onclick="toggleAudio()" style="width: 35px; height: 35px; border-radius: 50%; background: var(--bg-color); border: 2px solid var(--border-color); color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; padding: 0; box-shadow: 0 0 10px var(--glow-color);" title="Mute/Unmute Audio">🔊</button>
+
+        <!-- Language Selector Trigger (Disamping Menu Tema) -->
+        <div id="lang-floating-container" style="position: relative;">
+            <div id="lang-options" style="display: none; position: absolute; bottom: 45px; right: 0; background: rgba(5,5,5,0.95); border: 1px solid var(--border-color); padding: 8px; border-radius: 8px; flex-direction: column; gap: 6px; min-width: 130px; box-shadow: 0 0 15px var(--glow-color);">
+                <button onclick="switchLanguage('id')" style="border: none; background: transparent; color: #22c55e; text-align: left; cursor: pointer; padding: 6px 8px; font-family: 'Press Start 2P', monospace; font-size: 10px;">🇮🇩 ID</button>
+                <button onclick="switchLanguage('en')" style="border: none; background: transparent; color: #38bdf8; text-align: left; cursor: pointer; padding: 6px 8px; font-family: 'Press Start 2P', monospace; font-size: 10px;">🇬🇧 EN</button>
+            </div>
+            <div id="lang-trigger" onclick="toggleLangMenu()" style="width: 35px; height: 35px; border-radius: 50%; background: var(--bg-color); border: 2px solid var(--border-color); cursor: pointer; box-shadow: 0 0 10px var(--glow-color); display: flex; align-items: center; justify-content: center; user-select: none;" title="Pilih Bahasa / Language">
+                <span id="lang-trigger-btn" style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--text-color);">ID</span>
+            </div>
+        </div>
 
         <!-- Theme Selector Trigger -->
         <div id="theme-floating-container" style="position: relative;">
@@ -132,6 +143,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script type="module" src="app.js?v=3"></script>
+    <script type="module" src="app.js?v=4"></script>
 </body>
 </html>

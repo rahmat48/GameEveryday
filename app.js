@@ -1,4 +1,5 @@
 import { firebaseConfig } from "./firebase-config.js";
+import { setLanguage, getLanguage, t, applyTranslations } from "./i18n.js";
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -38,7 +39,7 @@ async function loadGames() {
     const games = await response.json();
 
     if (games.length === 0) {
-        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.6; font-style: italic;">Misi baru sedang disiapkan... Kembali lagi besok!</p>';
+        container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; opacity: 0.6; font-style: italic;">${t('noNewMission')}</p>`;
         return;
     }
 
@@ -53,10 +54,10 @@ async function loadGames() {
             <h3 style="cursor: pointer;" onclick="launchGame('${game.path}', '${game.id}', '${game.title}')">${game.title}</h3>
             <p>${game.description}</p>
             <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 10px;">
-                <button onclick="launchGame('${game.path}', '${game.id}', '${game.title}')" style="flex: 2; padding: 8px; font-size: 1rem;">MAIN</button>
-                <button onclick="openLeaderboard('${game.id}', '${game.title}')" style="flex: 1; padding: 8px; font-size: 0.95rem; border-color: #f59e0b; color: #f59e0b;">🏆 SKOR</button>
+                <button onclick="launchGame('${game.path}', '${game.id}', '${game.title}')" style="flex: 2; padding: 8px; font-size: 1rem;">${t('btnPlay')}</button>
+                <button onclick="openLeaderboard('${game.id}', '${game.title}')" style="flex: 1; padding: 8px; font-size: 0.95rem; border-color: #f59e0b; color: #f59e0b;">${t('btnScore')}</button>
             </div>
-            <small>RILIS: ${releaseDate}</small>
+            <small>${t('released')} ${releaseDate}</small>
         `;
         container.appendChild(card);
 
@@ -264,8 +265,8 @@ function showAuthModal(mode) {
     const errBox = document.getElementById('auth-error-msg');
     if (errBox) errBox.style.display = 'none';
 
-    document.getElementById('modal-title').innerText = mode === 'login' ? 'Login' : 'Sign Up';
-    document.getElementById('auth-submit').innerText = mode === 'login' ? 'Login' : 'Sign Up';
+    document.getElementById('modal-title').innerText = mode === 'login' ? t('loginTitle') : t('signupTitle');
+    document.getElementById('auth-submit').innerText = mode === 'login' ? t('loginTitle') : t('signupTitle');
     document.getElementById('signup-extra').style.display = mode === 'signup' ? 'block' : 'none';
     
     const forgotLink = document.getElementById('forgot-password-link');
@@ -415,13 +416,14 @@ auth.onAuthStateChanged(async user => {
                 const hours = Math.floor(totalSecs / 3600);
                 const minutes = Math.floor((totalSecs % 3600) / 60);
                 const seconds = totalSecs % 60;
+                const prefix = t('flightHours');
 
                 if (hours > 0) {
-                    flightHoursEl.innerText = `⏱ JAM TERBANG: ${hours}j ${minutes}m`;
+                    flightHoursEl.innerText = `${prefix} ${hours}j ${minutes}m`;
                 } else if (minutes > 0) {
-                    flightHoursEl.innerText = `⏱ JAM TERBANG: ${minutes}m ${seconds}s`;
+                    flightHoursEl.innerText = `${prefix} ${minutes}m ${seconds}s`;
                 } else {
-                    flightHoursEl.innerText = `⏱ JAM TERBANG: ${seconds}s`;
+                    flightHoursEl.innerText = `${prefix} ${seconds}s`;
                 }
             }
         });
@@ -608,20 +610,39 @@ function setTheme(theme) {
 const initialTheme = localStorage.getItem('hub_selected_theme') || 'purple';
 setTheme(initialTheme);
 
-// Floating Theme Click Logic (No mouseleave auto-close)
+// Floating Theme & Language Click Logic
 const themeOptions = document.getElementById('theme-options');
+const langOptions = document.getElementById('lang-options');
 
 function toggleThemeMenu() {
     if (themeOptions) {
         themeOptions.style.display = themeOptions.style.display === 'flex' ? 'none' : 'flex';
     }
+    if (langOptions) langOptions.style.display = 'none';
 }
 
-// Close theme menu only when clicking outside
+function toggleLangMenu() {
+    if (langOptions) {
+        langOptions.style.display = langOptions.style.display === 'flex' ? 'none' : 'flex';
+    }
+    if (themeOptions) themeOptions.style.display = 'none';
+}
+
+function switchLanguage(lang) {
+    setLanguage(lang);
+    if (langOptions) langOptions.style.display = 'none';
+    loadGames();
+}
+
+// Close menus only when clicking outside
 document.addEventListener('click', (e) => {
-    const container = document.getElementById('theme-floating-container');
-    if (container && !container.contains(e.target)) {
-        themeOptions.style.display = 'none';
+    const themeContainer = document.getElementById('theme-floating-container');
+    if (themeContainer && !themeContainer.contains(e.target)) {
+        if (themeOptions) themeOptions.style.display = 'none';
+    }
+    const langContainer = document.getElementById('lang-floating-container');
+    if (langContainer && !langContainer.contains(e.target)) {
+        if (langOptions) langOptions.style.display = 'none';
     }
 });
 
@@ -985,6 +1006,9 @@ window.addEventListener('unhandledrejection', (event) => {
     showToast(`⚠ Kesalahan: ${msg}`);
 });
 
+// Inisialisasi awal bahasa
+setLanguage(getLanguage());
+
 // Expose functions globally for inline HTML event handlers
 Object.assign(window, {
     showAuthModal,
@@ -1003,6 +1027,8 @@ Object.assign(window, {
     toggleAudio,
     toggleThemeMenu,
     setTheme,
+    toggleLangMenu,
+    switchLanguage,
     loadGames,
     showToast,
     launchGame,
