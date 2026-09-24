@@ -4,12 +4,12 @@
  */
 
 import kaplay from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
-import { menuScene } from "./scenes/menu.js";
-import { howToPlayScene } from "./scenes/howToPlay.js";
-import { gameplayScene } from "./scenes/gameplay.js";
-import { gameOverScene } from "./scenes/gameOver.js";
-import { initAudio } from "./audio.js";
-import { initMobileController } from "./mobileController.js";
+import { menuScene } from "./scenes/menu.js?v=4";
+import { howToPlayScene } from "./scenes/howToPlay.js?v=4";
+import { gameplayScene } from "./scenes/gameplay.js?v=4";
+import { gameOverScene } from "./scenes/gameOver.js?v=4";
+import { initAudio } from "./audio.js?v=4";
+import { initMobileController } from "./mobileController.js?v=4";
 
 const k = kaplay({
   width: 800,

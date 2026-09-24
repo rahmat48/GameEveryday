@@ -175,19 +175,23 @@ export function gameplayScene(k) {
     ]);
 
     // ==========================================
-    // ENTITAS 4 HANTU CYBER
+    // ENTITAS 4 HANTU CYBER (tile-progress model)
     // ==========================================
     const ghosts = GHOST_ARRAY.map(cfg => {
+      const spawnCol = Math.floor(cfg.spawnOffset.col);
+      const spawnRow = Math.floor(cfg.spawnOffset.row);
       const g = {
         config: cfg,
-        col: Math.floor(cfg.spawnOffset.col),
-        row: Math.floor(cfg.spawnOffset.row),
-        x: OFFSET_X + cfg.spawnOffset.col * CELL_SIZE + CELL_SIZE / 2,
-        y: OFFSET_Y + cfg.spawnOffset.row * CELL_SIZE + CELL_SIZE / 2,
-        dir: DIRS.up,
+        col: spawnCol,          // tile ghost currently occupies
+        row: spawnRow,
+        tc: spawnCol,           // next tile target col
+        tr: spawnRow,           // next tile target row
+        progress: 0,            // 0→1 interpolation between col,row → tc,tr
+        dir: { x: 0, y: 1 },   // start moving down inside house
         state: cfg.startState,
-        target: { col: 13, row: 11, x: 13, y: 11 },
         houseBounceY: 0,
+        x: OFFSET_X + spawnCol * CELL_SIZE + CELL_SIZE / 2,
+        y: OFFSET_Y + spawnRow * CELL_SIZE + CELL_SIZE / 2,
         obj: null,
         eyesObj: null
       };
@@ -200,7 +204,6 @@ export function gameplayScene(k) {
         k.z(15)
       ]);
 
-      // Pupil Mata Hantu
       g.eyesObj = g.obj.add([
         k.rect(8, 4, { radius: 1 }),
         k.pos(0, -2),
@@ -519,8 +522,8 @@ export function gameplayScene(k) {
         pacman.x = tunnelMinX + 2;
       }
 
-      pacman.col = (pacman.x - OFFSET_X) / CELL_SIZE;
-      pacman.row = (pacman.y - OFFSET_Y) / CELL_SIZE;
+      pacman.col = Math.floor((pacman.x - OFFSET_X) / CELL_SIZE);
+      pacman.row = Math.floor((pacman.y - OFFSET_Y) / CELL_SIZE);
 
       pacman.obj.pos = k.vec2(pacman.x, pacman.y);
 
@@ -598,155 +601,202 @@ export function gameplayScene(k) {
     }
 
     // ==========================================
-    // LOGIKA PERGERAKAN HANTU (GHOST AI)
+    // LOGIKA PERGERAKAN HANTU (tile-progress model)
     // ==========================================
+    function pickGhostNextTile(ghost) {
+      // Pilih tile berikutnya dari tile saat ini (ghost.col, ghost.row)
+      const isFrightened = ghost.state === "frightened";
+      const isEaten = ghost.state === "eaten";
+
+      // Hitung target tile berdasarkan AI
+      let targetCol, targetRow;
+      if (isEaten) {
+        // Mata hantu kembali ke pintu rumah
+        targetCol = 13; targetRow = 12;
+      } else if (isFrightened) {
+        // Arah random saat ketakutan — ditentukan di bawah
+        targetCol = null; targetRow = null;
+      } else {
+        const pacTile = { col: pacman.col, row: pacman.row, x: pacman.col, y: pacman.row };
+        const blinkyTile = blinky ? { col: blinky.col, row: blinky.row, x: blinky.col, y: blinky.row } : null;
+        const t = getGhostTargetTile(ghost, pacTile, blinkyTile, state.globalMode);
+        targetCol = t.col ?? t.x;
+        targetRow = t.row ?? t.y;
+      }
+
+      // 4 arah kandidat, tidak boleh balik arah (kecuali dead-end)
+      const DIRS4 = [
+        { x: 0, y: -1 }, { x: -1, y: 0 },
+        { x: 0, y: 1 },  { x: 1, y: 0 }
+      ];
+      const back = { x: -ghost.dir.x, y: -ghost.dir.y };
+
+      function canGhostEnter(col, row) {
+        // Warp tunnel
+        let c = col, r = row;
+        if (r === 14) c = ((c % COLS) + COLS) % COLS;
+        if (c < 0 || c >= COLS || r < 0 || r >= ROWS) return false;
+        const tile = stageData.map[r]?.[c];
+        if (!tile || tile === '#') return false;
+        if (tile === '=') return isEaten || ghost.state === "leaving";
+        if (tile === 'G') return true; // ghost house interior
+        return true;
+      }
+
+      let candidates = DIRS4.filter(d => {
+        if (d.x === back.x && d.y === back.y) return false;
+        return canGhostEnter(ghost.col + d.x, ghost.row + d.y);
+      });
+
+      // Dead-end: allow reverse
+      if (candidates.length === 0) {
+        candidates = DIRS4.filter(d => canGhostEnter(ghost.col + d.x, ghost.row + d.y));
+      }
+      if (candidates.length === 0) return; // stuck — should not happen
+
+      let chosen;
+      if (isFrightened) {
+        chosen = candidates[Math.floor(Math.random() * candidates.length)];
+      } else {
+        let best = Infinity;
+        for (const d of candidates) {
+          const nc = ghost.col + d.x, nr = ghost.row + d.y;
+          const dist = (nc - targetCol) ** 2 + (nr - targetRow) ** 2;
+          if (dist < best) { best = dist; chosen = d; }
+        }
+      }
+
+      ghost.dir = chosen;
+      ghost.tc = ghost.col + chosen.x;
+      ghost.tr = ghost.row + chosen.y;
+
+      // Warp tunnel wrap
+      if (ghost.tr === 14) ghost.tc = ((ghost.tc % COLS) + COLS) % COLS;
+    }
+
     function updateGhosts(dt) {
       if (state.readyTimer > 0 || state.isPaused || state.isGameOver || state.isDying || state.isStageClear) return;
 
       // Siklus Mode Global Scatter / Chase
       state.modeTimer += dt;
       if (state.globalMode === "scatter" && state.modeTimer > 7) {
-        state.globalMode = "chase";
-        state.modeTimer = 0;
+        state.globalMode = "chase"; state.modeTimer = 0;
       } else if (state.globalMode === "chase" && state.modeTimer > 20) {
-        state.globalMode = "scatter";
-        state.modeTimer = 0;
+        state.globalMode = "scatter"; state.modeTimer = 0;
       }
 
       ghosts.forEach(ghost => {
-        // Cek apakah hantu di dalam rumah sudah boleh keluar
+        // ── MODE: HOUSE (mental bounce inside cage) ──
         if (ghost.state === "house") {
           ghost.houseBounceY += dt * 4;
           ghost.y = OFFSET_Y + ghost.config.spawnOffset.row * CELL_SIZE + Math.sin(ghost.houseBounceY) * 3;
+          ghost.x = OFFSET_X + ghost.config.spawnOffset.col * CELL_SIZE + CELL_SIZE / 2;
+          ghost.col = Math.floor(ghost.config.spawnOffset.col);
+          ghost.row = Math.floor(ghost.config.spawnOffset.row);
           ghost.obj.pos = k.vec2(ghost.x, ghost.y);
-
           if (state.dotsEaten >= ghost.config.exitDotThreshold) {
             ghost.state = "leaving";
+            ghost.tc = ghost.col;
+            ghost.tr = ghost.row;
+            ghost.progress = 0;
+            ghost.dir = { x: 0, y: -1 };
           }
           return;
         }
 
+        // ── MODE: LEAVING (slide out of ghost house) ──
         if (ghost.state === "leaving") {
-          // Meluncur ke titik center tepat di atas pintu gerbang (col 13, row 11)
-          const targetGateX = OFFSET_X + 13 * CELL_SIZE + CELL_SIZE / 2;
-          const targetGateY = OFFSET_Y + 11 * CELL_SIZE + CELL_SIZE / 2;
-          const dx = targetGateX - ghost.x;
-          const dy = targetGateY - ghost.y;
+          const exitCol = 13, exitRow = 11;
+          const targetX = OFFSET_X + exitCol * CELL_SIZE + CELL_SIZE / 2;
+          const targetY = OFFSET_Y + exitRow * CELL_SIZE + CELL_SIZE / 2;
 
-          if (Math.abs(dx) > 1.5) {
-            ghost.x += Math.sign(dx) * stageData.ghostSpeed * 0.8 * dt;
-          } else if (Math.abs(dy) > 1.5) {
-            ghost.y += Math.sign(dy) * stageData.ghostSpeed * 0.8 * dt;
+          const dx = targetX - ghost.x;
+          const dy = targetY - ghost.y;
+
+          const leaveSpeed = stageData.ghostSpeed * 0.7;
+          if (Math.abs(dx) > 1) {
+            ghost.x += Math.sign(dx) * leaveSpeed * dt;
+          } else if (Math.abs(dy) > 1) {
+            ghost.y += Math.sign(dy) * leaveSpeed * dt;
           } else {
-            ghost.x = targetGateX;
-            ghost.y = targetGateY;
-            ghost.col = 13;
-            ghost.row = 11;
-            ghost.dir = DIRS.left;
-            ghost.state = (state.frightenedTimer > 0) ? "frightened" : state.globalMode;
+            // Arrived at exit tile — start tile-progress movement
+            ghost.x = targetX;
+            ghost.y = targetY;
+            ghost.col = exitCol;
+            ghost.row = exitRow;
+            ghost.tc = exitCol;
+            ghost.tr = exitRow;
+            ghost.progress = 0;
+            ghost.dir = { x: -1, y: 0 };
+            ghost.state = state.frightenedTimer > 0 ? "frightened" : state.globalMode;
+            pickGhostNextTile(ghost);
           }
           ghost.obj.pos = k.vec2(ghost.x, ghost.y);
+          ghost.obj.color = k.Color.fromHex(ghost.config.color);
           return;
         }
 
-        // Tentukan kecepatan hantu berdasarkan state
-        let speed = stageData.ghostSpeed;
-        if (ghost.state === "frightened") speed *= 0.6;
-        if (ghost.state === "eaten") speed *= 2.2;
+        // ── TILE-PROGRESS MOVEMENT ──
+        let speedTilesPerSec = stageData.ghostSpeed / CELL_SIZE;
+        if (ghost.state === "frightened") speedTilesPerSec *= 0.55;
+        if (ghost.state === "eaten")      speedTilesPerSec *= 1.8;
 
-        const curCol = Math.floor((ghost.x - OFFSET_X) / CELL_SIZE);
-        const curRow = Math.floor((ghost.y - OFFSET_Y) / CELL_SIZE);
-        const cellCenterX = OFFSET_X + curCol * CELL_SIZE + CELL_SIZE / 2;
-        const cellCenterY = OFFSET_Y + curRow * CELL_SIZE + CELL_SIZE / 2;
+        ghost.progress += speedTilesPerSec * dt;
 
-        const distToCenterX = Math.abs(ghost.x - cellCenterX);
-        const distToCenterY = Math.abs(ghost.y - cellCenterY);
+        while (ghost.progress >= 1) {
+          ghost.progress -= 1;
+          // Arrive at next tile
+          ghost.col = ghost.tc;
+          ghost.row = ghost.tr;
 
-        // Jika berada di dekat titik tengah persimpangan, tentukan arah baru
-        if (distToCenterX <= 3 && distToCenterY <= 3) {
-          ghost.col = curCol;
-          ghost.row = curRow;
+          // Warp tunnel
+          if (ghost.col < 0) ghost.col = COLS - 1;
+          else if (ghost.col >= COLS) ghost.col = 0;
 
-          // Snap ke center untuk presisi
-          ghost.x = cellCenterX;
-          ghost.y = cellCenterY;
-
-          const pacTile = {
-            x: Math.round((pacman.x - OFFSET_X) / CELL_SIZE),
-            y: Math.round((pacman.y - OFFSET_Y) / CELL_SIZE),
-            col: Math.round((pacman.x - OFFSET_X) / CELL_SIZE),
-            row: Math.round((pacman.y - OFFSET_Y) / CELL_SIZE),
-            dir: ghost.dir
-          };
-          const blinkyTile = blinky ? {
-            x: Math.round((blinky.x - OFFSET_X) / CELL_SIZE),
-            y: Math.round((blinky.y - OFFSET_Y) / CELL_SIZE)
-          } : null;
-
-          ghost.target = getGhostTargetTile(ghost, pacTile, blinkyTile, state.globalMode);
-          const nextDir = getNextGhostDirection(ghost, ghost.target, stageData.map, ghost.state === "frightened");
-
-          if (nextDir) {
-            ghost.dir = nextDir;
-          }
-
-          // Jika hantu mata (eaten) sudah tiba di area rumah hantu
-          if (ghost.state === "eaten" && curCol >= 12 && curCol <= 15 && curRow >= 11 && curRow <= 14) {
+          // Check: eaten ghost reached ghost house
+          if (ghost.state === "eaten" && ghost.col >= 12 && ghost.col <= 15 && ghost.row >= 11 && ghost.row <= 14) {
             ghost.state = "leaving";
+            ghost.progress = 0;
+            break;
           }
+
+          pickGhostNextTile(ghost);
         }
 
-        ghost.x += ghost.dir.x * speed * dt;
-        ghost.y += ghost.dir.y * speed * dt;
-
-        // Warp tunnel horizontal (row 14)
-        const tunnelMinX = OFFSET_X - CELL_SIZE;
-        const tunnelMaxX = OFFSET_X + COLS * CELL_SIZE;
-        if (ghost.x < tunnelMinX) ghost.x = tunnelMaxX - 2;
-        if (ghost.x > tunnelMaxX) ghost.x = tunnelMinX + 2;
-
-        // Guard: jika keluar batas vertikal, kembalikan ke rumah hantu
-        const mazeMinY = OFFSET_Y;
-        const mazeMaxY = OFFSET_Y + ROWS * CELL_SIZE;
-        if (ghost.y < mazeMinY - CELL_SIZE || ghost.y > mazeMaxY + CELL_SIZE) {
-          ghost.x = OFFSET_X + 13 * CELL_SIZE + CELL_SIZE / 2;
-          ghost.y = OFFSET_Y + 14 * CELL_SIZE + CELL_SIZE / 2;
-          ghost.col = 13; ghost.row = 14;
-          ghost.state = "house";
-          ghost.dir = DIRS.up;
-        }
-
+        // Interpolate pixel position
+        const fromX = OFFSET_X + ghost.col * CELL_SIZE + CELL_SIZE / 2;
+        const fromY = OFFSET_Y + ghost.row * CELL_SIZE + CELL_SIZE / 2;
+        const toX   = OFFSET_X + ghost.tc  * CELL_SIZE + CELL_SIZE / 2;
+        const toY   = OFFSET_Y + ghost.tr  * CELL_SIZE + CELL_SIZE / 2;
+        ghost.x = fromX + (toX - fromX) * ghost.progress;
+        ghost.y = fromY + (toY - fromY) * ghost.progress;
         ghost.obj.pos = k.vec2(ghost.x, ghost.y);
 
-        // Update warna visual hantu
+        // Warna visual
         if (ghost.state === "frightened") {
-          // Berkedip putih jika durasi frightened hampir habis
-          const isFlashing = (state.frightenedTimer < 2 && Math.floor(state.frightenedTimer * 6) % 2 === 0);
+          const isFlashing = state.frightenedTimer < 2 && Math.floor(state.frightenedTimer * 6) % 2 === 0;
           ghost.obj.color = isFlashing ? k.rgb(255, 255, 255) : k.rgb(56, 189, 248);
         } else if (ghost.state === "eaten") {
-          ghost.obj.color = k.rgb(15, 23, 42); // Tubuh tak kasat mata (hanya mata)
+          ghost.obj.color = k.rgb(15, 23, 42);
         } else {
           ghost.obj.color = k.Color.fromHex(ghost.config.color);
         }
 
-        // ==========================================
-        // TABRAKAN PACMAN VS HANTU
-        // ==========================================
+        // ── TABRAKAN PACMAN VS HANTU ──
         const distToPacman = Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y);
         if (distToPacman < 12) {
           if (ghost.state === "frightened") {
-            // Hantu dimakan oleh Pacman!
             state.ghostStreak++;
             const points = 200 * Math.pow(2, state.ghostStreak - 1);
             state.score += points;
             state.ghostsEatenTotal++;
-
             ghost.state = "eaten";
+            ghost.progress = 0;
+            pickGhostNextTile(ghost);
             playSfx("eat-ghost");
             floatingText(k, `+${points}`, ghost.obj.pos, k.rgb(250, 204, 21), 16);
             burstParticles(k, ghost.obj.pos, k.rgb(56, 189, 248), 16);
           } else if (ghost.state !== "eaten" && ghost.state !== "house" && ghost.state !== "leaving") {
-            // Pacman tertangkap oleh hantu!
             handlePacmanDeath();
           }
         }
@@ -778,23 +828,29 @@ export function gameplayScene(k) {
     function resetPositions() {
       pacman.x = OFFSET_X + pacmanSpawn.col * CELL_SIZE + CELL_SIZE / 2;
       pacman.y = OFFSET_Y + pacmanSpawn.row * CELL_SIZE + CELL_SIZE / 2;
+      pacman.col = pacmanSpawn.col;
+      pacman.row = pacmanSpawn.row;
       pacman.dir = DIRS.left;
       pacman.bufferedDir = DIRS.left;
       pacman.obj.pos = k.vec2(pacman.x, pacman.y);
 
       ghosts.forEach(g => {
-        g.x = OFFSET_X + g.config.spawnOffset.col * CELL_SIZE + CELL_SIZE / 2;
-        g.y = OFFSET_Y + g.config.spawnOffset.row * CELL_SIZE + CELL_SIZE / 2;
-        g.col = Math.floor(g.config.spawnOffset.col);
-        g.row = Math.floor(g.config.spawnOffset.row);
-        g.dir = DIRS.up;
+        const spawnCol = Math.floor(g.config.spawnOffset.col);
+        const spawnRow = Math.floor(g.config.spawnOffset.row);
+        g.col = spawnCol;
+        g.row = spawnRow;
+        g.tc = spawnCol;
+        g.tr = spawnRow;
+        g.progress = 0;
+        g.x = OFFSET_X + spawnCol * CELL_SIZE + CELL_SIZE / 2;
+        g.y = OFFSET_Y + spawnRow * CELL_SIZE + CELL_SIZE / 2;
+        g.dir = { x: 0, y: 1 };
         g.state = g.config.startState;
-        g.target = { col: 13, row: 11, x: 13, y: 11 };
         g.houseBounceY = 0;
         g.obj.pos = k.vec2(g.x, g.y);
+        g.obj.color = k.Color.fromHex(g.config.color);
       });
 
-      // Readytimer kecil setelah respawn
       state.readyTimer = 1.5;
       const respawnLabel = k.add([
         k.text("READY!", { size: 24, font: "monospace" }),
