@@ -820,76 +820,199 @@ function initPreviewAnimation() {
     if (!pCanvas) return;
     const pCtx = pCanvas.getContext('2d');
 
-    let shipX = 60;
-    let shipY = 110;
-    let laser = null;
-    let target = { x: 380, y: 110, size: 30 };
-    let stars = [];
-
-    for (let i = 0; i < 35; i++) {
+    const stars = [];
+    for (let i = 0; i < 40; i++) {
         stars.push({
             x: Math.random() * pCanvas.width,
             y: Math.random() * pCanvas.height,
-            speed: Math.random() * 2 + 1
+            speed: Math.random() * 2 + 1,
+            size: Math.random() < 0.3 ? 2 : 1
         });
     }
+
+    const demoGames = [
+        {
+            mode: "battle-mtk",
+            label: "● MISSION 1: BATTLE MTK (MATH DUEL)",
+            badgeCol: "#a855f7",
+            problems: [
+                { q: "8 x 9 = ?", ans: "72", opts: ["64", "72", "81"] },
+                { q: "48 / 6 = ?", ans: "8", opts: ["7", "8", "9"] },
+                { q: "35 + 27 = ?", ans: "62", opts: ["52", "62", "72"] }
+            ]
+        },
+        {
+            mode: "snake-arcade",
+            label: "● MISSION 2: SNAKE ARCADE (DATA WORM)",
+            badgeCol: "#22c55e"
+        }
+    ];
+
+    let particles = [];
 
     function loop() {
         pCtx.fillStyle = '#060614';
         pCtx.fillRect(0, 0, pCanvas.width, pCanvas.height);
 
+        // Retro CRT Scanlines
+        pCtx.strokeStyle = 'rgba(255,255,255,0.035)';
+        pCtx.lineWidth = 1;
+        for (let gy = 0; gy < pCanvas.height; gy += 8) {
+            pCtx.beginPath();
+            pCtx.moveTo(0, gy);
+            pCtx.lineTo(pCanvas.width, gy);
+            pCtx.stroke();
+        }
+
         // Bintang latar
-        pCtx.fillStyle = '#444466';
+        pCtx.fillStyle = '#64748b';
         stars.forEach(s => {
-            pCtx.fillRect(s.x, s.y, 2, 2);
+            pCtx.fillRect(s.x, s.y, s.size, s.size);
             s.x -= s.speed;
             if (s.x < 0) s.x = pCanvas.width;
         });
 
-        // Kapal pemain
-        shipY = 110 + Math.sin(Date.now() / 250) * 20;
-        pCtx.fillStyle = '#00ff41';
-        pCtx.beginPath();
-        pCtx.moveTo(shipX + 15, shipY);
-        pCtx.lineTo(shipX - 20, shipY - 14);
-        pCtx.lineTo(shipX - 10, shipY);
-        pCtx.lineTo(shipX - 20, shipY + 14);
-        pCtx.closePath();
-        pCtx.fill();
-
-        // Laser Tembakan
-        if (!laser && Math.random() > 0.94) {
-            laser = { x: shipX + 20, y: shipY };
+        // Partikel ledakan
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            pCtx.fillStyle = p.col;
+            pCtx.fillRect(p.x, p.y, p.size, p.size);
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.05;
+            if (p.life <= 0) particles.splice(i, 1);
         }
 
-        if (laser) {
+        // Berganti mode showcase setiap 4 detik
+        const totalCycle = Date.now() / 4000;
+        const activeGameIdx = Math.floor(totalCycle) % demoGames.length;
+        const curGame = demoGames[activeGameIdx];
+        const cycleProgress = (Date.now() % 4000) / 4000;
+
+        // Label status simulator di pojok kiri atas
+        pCtx.fillStyle = curGame.badgeCol;
+        pCtx.font = 'bold 11px monospace';
+        pCtx.textAlign = 'left';
+        pCtx.fillText(curGame.label, 16, 24);
+
+        if (curGame.mode === "battle-mtk") {
+            // SHOWCASE BATTLE MTK
+            const subIdx = Math.floor(Date.now() / 2000) % curGame.problems.length;
+            const prob = curGame.problems[subIdx];
+            const shootProg = (Date.now() % 2000) / 2000;
+
+            // Box Soal Matematika Neon
+            pCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            pCtx.strokeStyle = '#f59e0b';
+            pCtx.lineWidth = 2;
+            pCtx.fillRect(pCanvas.width / 2 - 90, 42, 180, 32);
+            pCtx.strokeRect(pCanvas.width / 2 - 90, 42, 180, 32);
+
             pCtx.fillStyle = '#f59e0b';
-            pCtx.fillRect(laser.x, laser.y - 3, 22, 6);
-            laser.x += 14;
+            pCtx.font = 'bold 18px monospace';
+            pCtx.textAlign = 'center';
+            pCtx.fillText(prob.q, pCanvas.width / 2, 64);
 
-            if (laser.x >= target.x - 15) {
-                // Ledakan partikel kecil
-                pCtx.fillStyle = '#ef4444';
-                pCtx.beginPath();
-                pCtx.arc(target.x, target.y, 22, 0, Math.PI * 2);
-                pCtx.fill();
-                laser = null;
+            // Pesawat Komandan (Kiri)
+            const shipX = 70;
+            const shipY = 145 + Math.sin(Date.now() / 250) * 12;
+            pCtx.font = '30px monospace';
+            pCtx.fillText('🚀', shipX, shipY);
+
+            // Boss Monster Matematika (Kanan)
+            const bossX = 410;
+            const bossY = 145 + Math.cos(Date.now() / 300) * 12;
+            pCtx.fillText('👾', bossX, bossY);
+
+            // Pilihan Jawaban
+            const optY = 135;
+            prob.opts.forEach((optText, i) => {
+                const bx = 160 + i * 58;
+                const isCorrect = optText === prob.ans;
+
+                if (isCorrect && shootProg > 0.4) {
+                    pCtx.fillStyle = 'rgba(34, 197, 94, 0.4)';
+                    pCtx.strokeStyle = '#22c55e';
+                } else {
+                    pCtx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                    pCtx.strokeStyle = '#64748b';
+                }
+
+                pCtx.lineWidth = 1;
+                pCtx.fillRect(bx, optY, 48, 28);
+                pCtx.strokeRect(bx, optY, 48, 28);
+
+                pCtx.fillStyle = isCorrect && shootProg > 0.4 ? '#22c55e' : '#cbd5e1';
+                pCtx.font = 'bold 15px monospace';
+                pCtx.fillText(optText, bx + 24, optY + 20);
+            });
+
+            // Laser Tembakan Jawaban Benar
+            if (shootProg > 0.4) {
+                const laserX = 230 + ((shootProg - 0.4) / 0.6) * (bossX - 250);
+                pCtx.fillStyle = '#00ff41';
+                pCtx.fillRect(laserX, 145, 24, 4);
+
+                if (shootProg > 0.88 && particles.length < 15) {
+                    for (let k = 0; k < 6; k++) {
+                        particles.push({
+                            x: bossX,
+                            y: bossY,
+                            vx: (Math.random() - 0.5) * 6,
+                            vy: (Math.random() - 0.5) * 6,
+                            size: Math.random() * 4 + 2,
+                            col: Math.random() < 0.5 ? '#ef4444' : '#f59e0b',
+                            life: 1
+                        });
+                    }
+                    pCtx.fillStyle = '#ef4444';
+                    pCtx.font = 'bold 14px monospace';
+                    pCtx.fillText('CRIT HIT!', bossX, bossY - 24);
+                }
             }
+        } else {
+            // SHOWCASE SNAKE ARCADE (DATA WORM)
+            const t = Date.now() / 200;
+            pCtx.textAlign = 'center';
+
+            // Gambar Badan Worm Berkelok
+            pCtx.fillStyle = '#22c55e';
+            for (let i = 0; i < 9; i++) {
+                const wx = 120 + i * 22;
+                const wy = 135 + Math.sin(t + i * 0.5) * 22;
+                pCtx.fillRect(wx - 9, wy - 9, 18, 18);
+            }
+
+            // Kepala Worm
+            const headX = 120 + 9 * 22;
+            const headY = 135 + Math.sin(t + 9 * 0.5) * 22;
+            pCtx.fillStyle = '#4ade80';
+            pCtx.fillRect(headX - 10, headY - 10, 20, 20);
+            pCtx.fillStyle = '#050a14';
+            pCtx.fillRect(headX + 2, headY - 4, 4, 4);
+
+            // Byte Data Ungu
+            const byteX = 380;
+            const byteY = 135 + Math.cos(t * 0.8) * 10;
+            pCtx.fillStyle = '#d946ef';
+            pCtx.fillRect(byteX - 10, byteY - 10, 20, 20);
+
+            // Power-up Emas Melayang
+            const powX = 260;
+            const powY = 75 + Math.sin(t) * 8;
+            pCtx.fillStyle = '#facc15';
+            pCtx.fillRect(powX - 8, powY - 8, 16, 16);
+            pCtx.fillStyle = '#facc15';
+            pCtx.font = '11px monospace';
+            pCtx.fillText('GHOST 5s', powX, powY + 22);
+
+            // Badge Info
+            pCtx.fillStyle = '#38bdf8';
+            pCtx.font = '13px monospace';
+            pCtx.fillText('ACCELERATING SPEED + POWER-UPS', pCanvas.width / 2, 200);
         }
 
-        // Alien Boss MTK
-        target.y = 110 + Math.cos(Date.now() / 350) * 30;
-        pCtx.fillStyle = '#a855f7';
-        pCtx.fillRect(target.x - target.size / 2, target.y - target.size / 2, target.size, target.size);
-        pCtx.fillStyle = '#ffffff';
-        pCtx.font = '16px monospace';
-        pCtx.fillText('MTK', target.x - 14, target.y + 6);
-
-        // Overlay status
-        pCtx.fillStyle = '#00ff41';
-        pCtx.font = '12px monospace';
-        pCtx.fillText('● LIVE GAMEPLAY SIMULATION', 15, 25);
-
+        pCtx.textAlign = 'left';
         requestAnimationFrame(loop);
     }
     loop();
