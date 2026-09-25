@@ -96,6 +96,8 @@ async function openLeaderboard(gameId, gameTitle) {
                 score = (u.snakeArcade && u.snakeArcade.highScore) || 0;
             } else if (gameId === 'orbit-defender') {
                 score = (u.orbitDefender && u.orbitDefender.highScore) || 0;
+            } else if (gameId === 'pacman-arcade') {
+                score = (u.pacmanArcade && u.pacmanArcade.highScore) || 0;
             } else {
                 score = u.highScore || 0;
             }
@@ -238,7 +240,8 @@ async function saveUserProfile() {
     try {
         await db.ref('users/' + user.uid).update({
             name: newName,
-            avatar: newAvatar
+            avatar: newAvatar,
+            email: user.email || ''
         });
 
         localStorage.setItem('user_name', newName);
@@ -852,6 +855,11 @@ function initPreviewAnimation() {
             mode: "orbit-defender",
             label: "● MISSION 3: ORBIT DEFENDER (360° TURRET)",
             badgeCol: "#00d4ff"
+        },
+        {
+            mode: "pacman-arcade",
+            label: "● MISSION 4: PACMAN ARCADE (GHOST CHASE)",
+            badgeCol: "#facc15"
         }
     ];
 
@@ -1108,6 +1116,91 @@ function initPreviewAnimation() {
             pCtx.font = '13px monospace';
             pCtx.textAlign = 'center';
             pCtx.fillText('360° DEFENSE • TRIPLE CANNON • EMP BOMB', pCanvas.width / 2, 204);
+        } else if (curGame.mode === "pacman-arcade") {
+            // SHOWCASE PACMAN ARCADE (GHOST CHASE)
+            const t = Date.now() / 240;
+
+            // Garis koridor maze (sederhana)
+            pCtx.strokeStyle = 'rgba(37, 99, 235, 0.35)';
+            pCtx.lineWidth = 2;
+            pCtx.strokeRect(40, 40, 400, 150);
+
+            // Titik-titik (pellets) sepanjang jalur
+            pCtx.fillStyle = '#fbbf24';
+            for (let i = 0; i < 12; i++) {
+                const dx = 70 + i * 31;
+                pCtx.beginPath();
+                pCtx.arc(dx, 115, 3, 0, Math.PI * 2);
+                pCtx.fill();
+            }
+
+            // Power pellet besar (berkedip)
+            const ppX = 200;
+            const ppY = 180;
+            const blink = (Math.sin(Date.now() / 180) + 1) / 2;
+            pCtx.fillStyle = '#f59e0b';
+            pCtx.beginPath();
+            pCtx.arc(ppX, ppY, 6 + blink * 2, 0, Math.PI * 2);
+            pCtx.fill();
+
+            // PACMAN (mulut animasi)
+            const pacX = 90 + Math.sin(t) * 30;
+            const pacY = 115;
+            const mouth = Math.abs(Math.sin(Date.now() / 160)) * 0.28 + 0.05;
+            const pacDir = Math.cos(t) >= 0 ? 0 : Math.PI;
+            pCtx.fillStyle = '#facc15';
+            pCtx.beginPath();
+            pCtx.arc(pacX, pacY, 13, pacDir + mouth, pacDir + Math.PI * 2 - mouth);
+            pCtx.lineTo(pacX, pacY);
+            pCtx.closePath();
+            pCtx.fill();
+
+            // Hantu mengejar (kiri -> kanan bolak-balik)
+            const ghosts = [
+                { col: '#ef4444', off: 0,   name: 'BLINKY' },
+                { col: '#f472b6', off: 40,  name: 'PINKY'  },
+                { col: '#22d3ee', off: 80,  name: 'INKY'   },
+                { col: '#fb923c', off: 120, name: 'CLYDE'  }
+            ];
+            ghosts.forEach((g, idx) => {
+                const gx = 340 - Math.sin(t + idx) * 70;
+                const gy = 115;
+                // badan hantu
+                pCtx.fillStyle = g.col;
+                pCtx.beginPath();
+                pCtx.arc(gx, gy - 2, 11, Math.PI, 0);
+                pCtx.lineTo(gx + 11, gy + 7);
+                for (let w = 0; w < 3; w++) {
+                    pCtx.lineTo(gx + 11 - (w * 7), gy + 3);
+                    pCtx.lineTo(gx + 11 - (w * 7) - 4, gy + 7);
+                }
+                pCtx.lineTo(gx - 11, gy + 7);
+                pCtx.closePath();
+                pCtx.fill();
+                // mata
+                pCtx.fillStyle = '#fff';
+                pCtx.beginPath();
+                pCtx.arc(gx - 4, gy - 3, 3, 0, Math.PI * 2);
+                pCtx.arc(gx + 4, gy - 3, 3, 0, Math.PI * 2);
+                pCtx.fill();
+                pCtx.fillStyle = '#1e3a8a';
+                pCtx.beginPath();
+                pCtx.arc(gx - 4, gy - 3, 1.6, 0, Math.PI * 2);
+                pCtx.arc(gx + 4, gy - 3, 1.6, 0, Math.PI * 2);
+                pCtx.fill();
+            });
+
+            // Buah bonus mengapung
+            const fruitY = 75 + Math.sin(t * 0.9) * 7;
+            pCtx.font = '22px monospace';
+            pCtx.textAlign = 'center';
+            pCtx.fillText('🍒', 250, fruitY);
+
+            // Info teks bawah
+            pCtx.fillStyle = '#facc15';
+            pCtx.font = '13px monospace';
+            pCtx.textAlign = 'center';
+            pCtx.fillText('EAT DOTS • EVADE GHOSTS • ENERGY MODE', pCanvas.width / 2, 204);
         }
 
         pCtx.textAlign = 'left';
@@ -1212,6 +1305,87 @@ function initCardPreviewAnim(canvasId, title) {
             ctx.fillStyle = '#38bdf8';
             ctx.font = '10px monospace';
             ctx.fillText('360° TURRET LIVE', 12, 20);
+
+            requestAnimationFrame(render);
+            return;
+        }
+
+        // Variasi preview jika kartu adalah Pacman Arcade
+        if (title && title.toLowerCase().includes('pacman')) {
+            const now = Date.now();
+            const cycle = (now % 4000) / 4000; // 4s loop
+            const isFrightened = cycle > 0.5;
+            const pacX = isFrightened ? (c.width - 40 - (cycle - 0.5) * 2 * (c.width - 80)) : (40 + cycle * 2 * (c.width - 80));
+            const pacY = 75;
+            const chomp = (Math.sin(now / 80) + 1) * 0.25;
+
+            // Mini maze corridor lines
+            ctx.strokeStyle = '#1e3a8a';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(20, 48, c.width - 40, 54);
+
+            // Dots along corridor
+            for (let dotX = 40; dotX < c.width - 40; dotX += 24) {
+                if (Math.abs(dotX - pacX) > 12) {
+                    ctx.fillStyle = '#fde047';
+                    ctx.beginPath();
+                    ctx.arc(dotX, pacY, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Power pellet at right side
+            if ((Math.floor(now / 200) % 2) === 0) {
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath();
+                ctx.arc(c.width - 36, pacY, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw Pacman
+            ctx.fillStyle = '#eab308';
+            ctx.beginPath();
+            const facingLeft = isFrightened;
+            const baseAngle = facingLeft ? Math.PI : 0;
+            ctx.arc(pacX, pacY, 12, baseAngle + chomp, baseAngle + Math.PI * 2 - chomp);
+            ctx.lineTo(pacX, pacY);
+            ctx.fill();
+
+            // Draw Ghost (Blinky / Blue Ghost)
+            const ghostDist = 36;
+            const ghostX = facingLeft ? pacX - ghostDist : pacX - ghostDist;
+            if (ghostX > 15 && ghostX < c.width - 15) {
+                ctx.fillStyle = isFrightened ? '#38bdf8' : '#ef4444';
+                // Head
+                ctx.beginPath();
+                ctx.arc(ghostX, pacY - 2, 10, Math.PI, 0, false);
+                ctx.lineTo(ghostX + 10, pacY + 10);
+                // Wavy skirt
+                const wave = (Math.floor(now / 150) % 2) * 2;
+                ctx.lineTo(ghostX + 5, pacY + 6 + wave);
+                ctx.lineTo(ghostX, pacY + 10);
+                ctx.lineTo(ghostX - 5, pacY + 6 + wave);
+                ctx.lineTo(ghostX - 10, pacY + 10);
+                ctx.closePath();
+                ctx.fill();
+
+                // Eyes
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(ghostX - 4, pacY - 4, 3, 0, Math.PI * 2);
+                ctx.arc(ghostX + 4, pacY - 4, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = isFrightened ? '#ea580c' : '#1e3a8a';
+                const eyeOff = facingLeft ? -1.5 : 1.5;
+                ctx.beginPath();
+                ctx.arc(ghostX - 4 + eyeOff, pacY - 4, 1.5, 0, Math.PI * 2);
+                ctx.arc(ghostX + 4 + eyeOff, pacY - 4, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = '#eab308';
+            ctx.font = '10px monospace';
+            ctx.fillText('PACMAN PROTOCOL LIVE', 12, 20);
 
             requestAnimationFrame(render);
             return;

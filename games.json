@@ -25,5 +25,14 @@
     "releaseDate": "2026-09-25",
     "path": "games/orbit-defender/index.html",
     "thumbnail": "games/orbit-defender/assets/img/thumb.png"
+  },
+  {
+    "id": "pacman-arcade",
+    "title": "Pacman Arcade",
+    "description": "Jelajahi labirin antariksa, lahap data pellet & energizer, buru hantu cyber Blinky, Pinky, Inky, Clyde!",
+    "genre": "Arcade",
+    "releaseDate": "2026-09-25",
+    "path": "games/pacman-arcade/index.html",
+    "thumbnail": "games/pacman-arcade/assets/img/thumb.png"
   }
 ]

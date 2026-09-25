@@ -60,6 +60,17 @@
           "bestDuration": {
             ".validate": "newData.isNumber() && newData.val() >= 0"
           }
+        },
+        "pacmanArcade": {
+          "highScore": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
+          },
+          "bestStage": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "bestDuration": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          }
         }
       }
     }

@@ -669,9 +669,6 @@ export function gameplayScene(k) {
       ghost.dir = chosen;
       ghost.tc = ghost.col + chosen.x;
       ghost.tr = ghost.row + chosen.y;
-
-      // Warp tunnel wrap
-      if (ghost.tr === 14) ghost.tc = ((ghost.tc % COLS) + COLS) % COLS;
     }
 
     function updateGhosts(dt) {
@@ -749,9 +746,14 @@ export function gameplayScene(k) {
           ghost.col = ghost.tc;
           ghost.row = ghost.tr;
 
-          // Warp tunnel
-          if (ghost.col < 0) ghost.col = COLS - 1;
-          else if (ghost.col >= COLS) ghost.col = 0;
+          // Warp tunnel: wrap tile AND keep pixel continuity
+          if (ghost.col < 0) {
+            ghost.col += COLS;
+            ghost.x += COLS * CELL_SIZE;
+          } else if (ghost.col >= COLS) {
+            ghost.col -= COLS;
+            ghost.x -= COLS * CELL_SIZE;
+          }
 
           // Check: eaten ghost reached ghost house
           if (ghost.state === "eaten" && ghost.col >= 12 && ghost.col <= 15 && ghost.row >= 11 && ghost.row <= 14) {
@@ -763,11 +765,21 @@ export function gameplayScene(k) {
           pickGhostNextTile(ghost);
         }
 
-        // Interpolate pixel position
-        const fromX = OFFSET_X + ghost.col * CELL_SIZE + CELL_SIZE / 2;
-        const fromY = OFFSET_Y + ghost.row * CELL_SIZE + CELL_SIZE / 2;
-        const toX   = OFFSET_X + ghost.tc  * CELL_SIZE + CELL_SIZE / 2;
-        const toY   = OFFSET_Y + ghost.tr  * CELL_SIZE + CELL_SIZE / 2;
+        // Interpolate pixel position (tunnel-wrap aware)
+        let fromX = OFFSET_X + ghost.col * CELL_SIZE + CELL_SIZE / 2;
+        let fromY = OFFSET_Y + ghost.row * CELL_SIZE + CELL_SIZE / 2;
+        let toX   = OFFSET_X + ghost.tc  * CELL_SIZE + CELL_SIZE / 2;
+        let toY   = OFFSET_Y + ghost.tr  * CELL_SIZE + CELL_SIZE / 2;
+
+        // Smooth warp: take short path across tunnel (row 14) instead of 448px jump
+        if (ghost.row === 14 && ghost.tr === 14) {
+          let dX = toX - fromX;
+          const wrapWidth = COLS * CELL_SIZE;
+          if (dX > wrapWidth / 2) dX -= wrapWidth;
+          else if (dX < -wrapWidth / 2) dX += wrapWidth;
+          toX = fromX + dX;
+        }
+
         ghost.x = fromX + (toX - fromX) * ghost.progress;
         ghost.y = fromY + (toY - fromY) * ghost.progress;
         ghost.obj.pos = k.vec2(ghost.x, ghost.y);

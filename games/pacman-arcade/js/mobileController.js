@@ -50,10 +50,12 @@ export function initMobileController(onDirectionChange) {
     container = document.createElement("div");
     container.id = "virtual-dpad";
     container.innerHTML = `
-      <button class="dpad-btn" id="dpad-up" data-dir="up" aria-label="Up">▲</button>
-      <button class="dpad-btn" id="dpad-down" data-dir="down" aria-label="Down">▼</button>
-      <button class="dpad-btn" id="dpad-left" data-dir="left" aria-label="Left">◀</button>
-      <button class="dpad-btn" id="dpad-right" data-dir="right" aria-label="Right">▶</button>
+      <div class="dpad-base"></div>
+      <div class="dpad-hub">P</div>
+      <button class="dpad-btn dpad-up" data-dir="up" aria-label="Up"><span>▲</span></button>
+      <button class="dpad-btn dpad-down" data-dir="down" aria-label="Down"><span>▼</span></button>
+      <button class="dpad-btn dpad-left" data-dir="left" aria-label="Left"><span>▲</span></button>
+      <button class="dpad-btn dpad-right" data-dir="right" aria-label="Right"><span>▲</span></button>
     `;
     const parent = document.getElementById("game-container") || document.body;
     parent.appendChild(container);

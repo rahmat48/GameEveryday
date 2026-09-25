@@ -39,10 +39,12 @@
 
   <!-- Virtual D-Pad untuk Mobile / Layar Sentuh -->
   <div id="virtual-dpad">
-    <button class="dpad-btn" id="dpad-up" data-dir="up">▲</button>
-    <button class="dpad-btn" id="dpad-down" data-dir="down">▼</button>
-    <button class="dpad-btn" id="dpad-left" data-dir="left">◀</button>
-    <button class="dpad-btn" id="dpad-right" data-dir="right">▶</button>
+    <div class="dpad-base"></div>
+    <div class="dpad-hub">P</div>
+    <button class="dpad-btn dpad-up" data-dir="up" aria-label="Up"><span>▲</span></button>
+    <button class="dpad-btn dpad-down" data-dir="down" aria-label="Down"><span>▼</span></button>
+    <button class="dpad-btn dpad-left" data-dir="left" aria-label="Left"><span>▲</span></button>
+    <button class="dpad-btn dpad-right" data-dir="right" aria-label="Right"><span>▲</span></button>
   </div>
 
   <script>
