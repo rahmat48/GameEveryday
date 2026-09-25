@@ -59,6 +59,8 @@ export function gameplayScene(k) {
     // Bersihkan carryover window state
     window.__pacmanCarryScore = 0;
     window.__pacmanCarryLives = 3;
+    window.__pacmanCarryGhosts = 0;
+    window.__pacmanCarryStartTime = 0;
 
     // Starfield Background
     for (let i = 0; i < 35; i++) {
