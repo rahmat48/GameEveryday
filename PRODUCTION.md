@@ -26,6 +26,14 @@ Struktur path basis data per game:
   - `users/<uid>/snakeArcade/highScore`
   - `users/<uid>/snakeArcade/highLength`
   - `users/<uid>/snakeArcade/bestDuration`
+- **Orbit Defender**:
+  - `users/<uid>/orbitDefender/highScore`
+- **Pacman Arcade**:
+  - `users/<uid>/pacmanArcade/highScore`
+- **Pulse Runner**:
+  - `users/<uid>/pulseRunner/highScore`
+  - `users/<uid>/pulseRunner/bestDistance`
+  - `users/<uid>/pulseRunner/bestCombo`
 - **Global**:
   - `users/<uid>/highScore`
   - `users/<uid>/totalPlayTime`
@@ -56,6 +64,7 @@ Event yang terlacak otomatis:
 - `game_click`: Card game ditekan
 - `game_played`: Game diluncurkan
 - `battle_mtk_stage_clear`: Stage game Battle MTK diselesaikan via postMessage
+- `pulse_runner_death`: Kapal Pulse Runner hancur via postMessage (payload: `score`, `distance`)
 
 ---
 

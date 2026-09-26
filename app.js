@@ -98,6 +98,8 @@ async function openLeaderboard(gameId, gameTitle) {
                 score = (u.orbitDefender && u.orbitDefender.highScore) || 0;
             } else if (gameId === 'pacman-arcade') {
                 score = (u.pacmanArcade && u.pacmanArcade.highScore) || 0;
+            } else if (gameId === 'pulse-runner') {
+                score = (u.pulseRunner && u.pulseRunner.highScore) || 0;
             } else {
                 score = u.highScore || 0;
             }
@@ -860,6 +862,11 @@ function initPreviewAnimation() {
             mode: "pacman-arcade",
             label: "● MISSION 4: PACMAN ARCADE (GHOST CHASE)",
             badgeCol: "#facc15"
+        },
+        {
+            mode: "pulse-runner",
+            label: "● MISSION 5: PULSE RUNNER (GRAVITY TUNNEL)",
+            badgeCol: "#00d4ff"
         }
     ];
 
@@ -1201,6 +1208,60 @@ function initPreviewAnimation() {
             pCtx.font = '13px monospace';
             pCtx.textAlign = 'center';
             pCtx.fillText('EAT DOTS • EVADE GHOSTS • ENERGY MODE', pCanvas.width / 2, 204);
+        } else if (curGame.mode === "pulse-runner") {
+            // SHOWCASE PULSE RUNNER (GRAVITY FLIP TUNNEL)
+            const t = Date.now() / 200;
+            const centerY = 120;
+            const wall = 55;
+
+            // Garis lantai & langit-langit terowongan neon
+            pCtx.strokeStyle = 'rgba(0, 212, 255, 0.5)';
+            pCtx.lineWidth = 3;
+            pCtx.beginPath();
+            pCtx.moveTo(0, centerY - wall);
+            pCtx.lineTo(pCanvas.width, centerY - wall);
+            pCtx.stroke();
+            pCtx.beginPath();
+            pCtx.moveTo(0, centerY + wall);
+            pCtx.lineTo(pCanvas.width, centerY + wall);
+            pCtx.stroke();
+
+            // Pesawat cyan yang balik gravitasi antara lantai & langit-langit
+            const flip = Math.floor(Date.now() / 1500) % 2 === 0 ? 1 : -1;
+            const shipX = 90 + Math.sin(t * 0.4) * 6;
+            const shipY = centerY + flip * (wall - 12);
+            pCtx.fillStyle = '#00d4ff';
+            pCtx.fillRect(shipX - 13, shipY - 6, 26, 12);
+            pCtx.fillStyle = '#060614';
+            pCtx.fillRect(shipX + 2, shipY - 2, 5, 4);
+
+            // Rintangan gelap scrolling kanan -> kiri seirama ritme flip
+            const obsProg = (Date.now() % 3000) / 3000;
+            pCtx.fillStyle = '#1e293b';
+            [0, 1, 2].forEach(i => {
+                const ox = pCanvas.width + 40 - ((obsProg * 300) + i * 150);
+                const onCeil = (i + Math.floor(Date.now() / 3000)) % 2 === 0;
+                const oy = onCeil ? centerY - wall : centerY + wall;
+                pCtx.fillRect(ox, onCeil ? oy : oy - 26, 16, 26);
+            });
+
+            // Garis kecepatan horizontal
+            pCtx.strokeStyle = 'rgba(0, 212, 255, 0.35)';
+            pCtx.lineWidth = 1;
+            for (let s = 0; s < 6; s++) {
+                const sy = centerY - 40 + s * 16;
+                const sx = pCanvas.width - ((Date.now() / 8 + s * 70) % (pCanvas.width + 80));
+                pCtx.beginPath();
+                pCtx.moveTo(sx, sy);
+                pCtx.lineTo(sx + 42, sy);
+                pCtx.stroke();
+            }
+
+            // Info teks bawah
+            pCtx.fillStyle = '#00d4ff';
+            pCtx.font = '13px monospace';
+            pCtx.textAlign = 'center';
+            pCtx.fillText('FLIP GRAVITY • DODGE BLOCKS • PULSE COMBO', pCanvas.width / 2, 204);
         }
 
         pCtx.textAlign = 'left';
@@ -1386,6 +1447,58 @@ function initCardPreviewAnim(canvasId, title) {
             ctx.fillStyle = '#eab308';
             ctx.font = '10px monospace';
             ctx.fillText('PACMAN PROTOCOL LIVE', 12, 20);
+
+            requestAnimationFrame(render);
+            return;
+        }
+
+        // Variasi preview jika kartu adalah Pulse Runner
+        if (title && title.toLowerCase().includes('pulse')) {
+            const now = Date.now();
+            const flip = Math.floor(now / 1400) % 2 === 0 ? 1 : -1;
+            const lineTop = 45;
+            const lineBot = 105;
+
+            // Garis neon lantai & langit-langit terowongan
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.55)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(14, lineTop);
+            ctx.lineTo(c.width - 14, lineTop);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(14, lineBot);
+            ctx.lineTo(c.width - 14, lineBot);
+            ctx.stroke();
+
+            // Pesawat cyan berbalik gravitasi antar dua garis
+            const shipY = flip === 1 ? lineBot - 10 : lineTop + 10;
+            ctx.fillStyle = '#00d4ff';
+            ctx.fillRect(56, shipY - 5, 20, 10);
+
+            // Balok rintangan scrolling kanan -> kiri
+            ctx.fillStyle = '#1e293b';
+            for (let i = 0; i < 3; i++) {
+                const bx = c.width - 20 - (((now / 6) + i * 90) % (c.width - 40));
+                const onCeil = (i + Math.floor(now / 2800)) % 2 === 0;
+                ctx.fillRect(bx, onCeil ? lineTop : lineBot - 18, 12, 18);
+            }
+
+            // Garis kecepatan
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.3)';
+            ctx.lineWidth = 1;
+            for (let s = 0; s < 4; s++) {
+                const sy = lineTop + 12 + s * 14;
+                const sx = c.width - (((now / 4) + s * 55) % (c.width + 60));
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(sx + 26, sy);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#00d4ff';
+            ctx.font = '10px monospace';
+            ctx.fillText('GRAVITY TUNNEL LIVE', 12, 20);
 
             requestAnimationFrame(render);
             return;

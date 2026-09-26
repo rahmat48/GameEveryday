@@ -71,6 +71,17 @@
           "bestDuration": {
             ".validate": "newData.isNumber() && newData.val() >= 0"
           }
+        },
+        "pulseRunner": {
+          "highScore": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
+          },
+          "bestDistance": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "bestCombo": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 8"
+          }
         }
       }
     }

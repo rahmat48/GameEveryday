@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#00d4ff">
+  <title>Pulse Runner - Space Game Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css?v=1">
+
+  <!-- Sentry Error Tracking -->
+  <script src="https://browser.sentry-cdn.com/7.114.0/bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    if (window.Sentry) {
+      const isProduction = window.location.hostname === 'game.rahmatdwi.my.id';
+      Sentry.init({
+        dsn: window.SENTRY_DSN || "",
+        environment: isProduction ? 'production' : 'development'
+      });
+      Sentry.setTag('game', 'pulse-runner');
+    }
+  </script>
+</head>
+<body>
+  <div id="hud-top">
+    <div id="commander-info">🚀 Commander</div>
+    <div class="hud-actions">
+      <button id="btn-mute" title="Matikan / Hidupkan Suara">🔊 SUARA</button>
+      <button id="btn-back" onclick="window.location.href='../../dashboard.html'">BACK</button>
+    </div>
+  </div>
+
+  <div id="game-container">
+    <!-- Canvas Kaplay akan ter-mount di sini -->
+  </div>
+
+  <!-- Tombol Flip Gravitasi Mobile (Otomatis tampil di layar sentuh / mobile) -->
+  <button id="mobile-flip-btn" title="Balik Gravitasi" onclick="window.dispatchEvent(new Event('pulse-flip'))">FLIP</button>
+
+  <script>
+    const savedTheme = localStorage.getItem('hub_selected_theme') || 'green';
+    document.body.className = `theme-${savedTheme}`;
+
+    const commanderName = localStorage.getItem('user_name') || 'Commander';
+    const commanderAvatar = localStorage.getItem('user_avatar') || '🚀';
+    const infoEl = document.getElementById('commander-info');
+    if (infoEl) {
+      infoEl.textContent = `${commanderAvatar} ${commanderName}`;
+    }
+  </script>
+  <script type="module">
+    import { toggleMute, isMuted } from "./js/audio.js";
+    const muteBtn = document.getElementById("btn-mute");
+    if (muteBtn) {
+      const updateLabel = () => {
+        muteBtn.textContent = isMuted() ? "🔇 MUTE" : "🔊 SUARA";
+      };
+      updateLabel();
+      muteBtn.onclick = () => {
+        toggleMute();
+        updateLabel();
+      };
+    }
+  </script>
+  <script type="module" src="./js/game.js?v=6"></script>
+</body>
+</html>

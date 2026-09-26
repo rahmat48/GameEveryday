@@ -43,6 +43,10 @@ Setiap pengguna bertindak sebagai **Komandan Luar Angkasa** yang memiliki profil
    - Game arkade klasik kontrol cacing data luar angkasa dengan sistem power-up (Slow-Mo & Ghost Mode), akselerasi dinamis, dan multi-kontroler (WASD / Arrow Keys / Virtual D-Pad / Touch Swipe).
 3. **Orbit Defender (360° Turret Defense Protocol)**:
    - Game shooter arkade retro pertahanan stasiun orbit antariksa dengan rotasi turret 360°, 3 tipe ancaman musuh (Drone, Asteroid, Bomber), wave progression dinamis, dan senjata super EMP pulsa kejut.
+4. **Pacman Arcade (Neon Grid Pursuit)**:
+   - Labirin klasa dengan 4 hantu ber-AI unik (chase, ambus, acak, pengusir), power pellet, mode ketakutan, kontrol keyboard/swipe/D-Pad virtual, dan sistem stage.
+5. **Pulse Runner (Gravity Tunnel Protocol)**:
+   - Endless runner tunggal-ketuk dengan **mekanik balik gravitasi** (lantai ↔ plafon), 12 pola rintangan bertingkat berdasarkan jarak, sistem bahan bakar yang terus menipis, combo multiplier hingga x8, near-miss bonus, 3 power-up (Phase Shift, Orb Magnet, Slow-Mo), gerbang laser bertelegarf, serta parallax tunnel neon 3 lapis. Rekor disimpan per pemain: skor tertinggi, jarak terjauh, dan combo terbaik.
 
 ---
 
@@ -105,23 +109,27 @@ GAME_EVERYDAY/
 ├── assets/                 # Folder Aset Statis Global (img, audio)
 └── games/
     ├── battle-mtk/         # Game Edukasi Duel Matematika
-    │   ├── index.html
-    │   ├── assets/
-    │   ├── css/style.css
-    │   └── js/
-    └── snake-arcade/       # Game Retro Data Worm (Snake)
-        ├── index.html
+    ├── snake-arcade/       # Game Retro Data Worm (Snake)
+    ├── orbit-defender/     # Game Shooter Turret Orbit 360°
+    ├── pacman-arcade/      # Game Labirin Pacman Neon
+    └── pulse-runner/       # Game Endless Runner Balik Gravitasi
+        ├── index.html      # Cangkang HTML, HUD & tombol FLIP mobile
+        ├── TEST.md         # Checklist pengujian QA
         ├── assets/
-        ├── css/style.css
+        │   ├── audio/      # SFX/BGM MP3 + generate_sfx.py (sintesis prosedural)
+        │   └── img/        # thumb.png + generate_thumb.py
+        ├── css/style.css   # Tema CRT per-game
         └── js/
-            ├── audio.js
-            ├── game.js
-            ├── input.js
-            ├── mobileController.js
-            ├── swipe.js
-            ├── ui.js
-            ├── user.js
+            ├── audio.js    # Loader & controler suara
+            ├── game.js     # Bootstrap Kaplay & registrasi scene
+            ├── patterns.js # Bank 12 pola rintangan bertingkat jarak
+            ├── ui.js       # Tema warna, button, bar, shake, flash
+            ├── user.js     # Firebase save/load skor & statistik
             └── scenes/
+                ├── menu.js
+                ├── howToPlay.js
+                ├── gameplay.js
+                └── gameOver.js
 ```
 
 ---

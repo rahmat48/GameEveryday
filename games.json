@@ -34,5 +34,14 @@
     "releaseDate": "2026-09-25",
     "path": "games/pacman-arcade/index.html",
     "thumbnail": "games/pacman-arcade/assets/img/thumb.png"
+  },
+  {
+    "id": "pulse-runner",
+    "title": "Pulse Runner",
+    "description": "Lari tanpa akhir di terowongan neon, balik gravitasi untuk hindari rintangan. Kecepatan dan combo naik terus, seberapa gesit kamu bertahan?",
+    "genre": "Runner",
+    "releaseDate": "2026-09-25",
+    "path": "games/pulse-runner/index.html",
+    "thumbnail": "games/pulse-runner/assets/img/thumb.png"
   }
 ]
